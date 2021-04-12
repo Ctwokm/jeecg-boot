@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.activiti.mapper.ActivitiMapper">
+
+    <sql id="paging_top_sql">
+    select * from (
+</sql>
+
+    <sql id="paging_bottom_sql">
+    ) t where t.rownumber between #{beginRowIndex,jdbcType=INTEGER} and #{endRowIndex,jdbcType=INTEGER}
+</sql>
+
+    <resultMap id="activitiConfigResultMap" type="org.jeecg.modules.activiti.entity.ActivitiEntity">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="process_key" jdbcType="VARCHAR" property="processKey"/>
+        <result column="task_key" jdbcType="VARCHAR" property="taskKey"/>
+        <result column="assign_type" jdbcType="VARCHAR" property="assignType"/>
+        <result column="assign_ids" jdbcType="VARCHAR" property="candidateUsers"/>
+        <result column="task_do" jdbcType="VARCHAR" property="taskDo"/>
+        <result column="task_type" jdbcType="VARCHAR" property="taskType"/>
+    </resultMap>
+
+
+    <select id="qryActivitiConfig" parameterType="org.jeecg.modules.activiti.entity.ActivitiEntity"
+            resultMap="activitiConfigResultMap">
+        select id, process_key, task_key, assign_type, assign_ids, task_do, task_type
+        from act_bz_config
+        where status = '0'
+
+        <if test="processKey != null">
+            and process_key = #{processKey,jdbcType=VARCHAR}
+        </if>
+
+        <if test="taskKey != null">
+            and task_key = #{taskKey,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
+    <select id="executeBusiness" statementType="CALLABLE" parameterType="org.jeecg.modules.activiti.entity.ActivitiEntity">
+      {call activiti_main(#{jsonString,mode=IN,jdbcType=VARCHAR},
+                          #{opCode,mode=IN,jdbcType=VARCHAR},
+                          #{resInfo,mode=OUT,jdbcType=VARCHAR},
+                          #{resCode,mode=OUT,jdbcType=VARCHAR},
+                          #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <select id="callbackToWriteProcessInstId" statementType="CALLABLE"
+            parameterType="org.jeecg.modules.activiti.entity.ActivitiEntity">
+        {call pk_activiti.callbackToWriteProcessInstId(#{jsonString,mode=IN,jdbcType=VARCHAR},
+                                                       #{processKey,mode=IN,jdbcType=VARCHAR},
+                                                       #{processInstanceId,mode=IN,jdbcType=VARCHAR},
+                                                       #{resCode,mode=OUT,jdbcType=VARCHAR},
+                                                       #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <select id="calPkgTruck" statementType="CALLABLE" parameterType="org.jeecg.modules.activiti.entity.CallTruckEntity">
+        {call pkg_truck_shf.callEntry(#{jsonIn,mode=IN,jdbcType=VARCHAR},
+                                 #{jsonPublic,mode=IN,jdbcType=VARCHAR},
+                                 #{jsonOut,mode=OUT,jdbcType=VARCHAR},
+                                 #{resCode,mode=OUT,jdbcType=VARCHAR},
+                                 #{resMsg,mode=OUT,jdbcType=VARCHAR},
+                                 #{opId,mode=IN,jdbcType=VARCHAR})}
+    </select>
+
+    <select id="getAssigneeName" parameterType="java.lang.String" resultType="java.lang.String">
+        select realname from sys_user where id = #{assignee,mode=IN,jdbcType=VARCHAR}
+    </select>
+
+    <resultMap id="taskHisResultMap" type="org.jeecg.modules.activiti.entity.ActivitiHisEntity">
+        <result column="proc_inst_id" jdbcType="VARCHAR" property="processInstanceId"/>
+        <result column="task_name" jdbcType="VARCHAR" property="taskName"/>
+        <result column="start_time" jdbcType="VARCHAR" property="exeBeginTime"/>
+        <result column="end_time" jdbcType="VARCHAR" property="exeEndTime"/>
+        <result column="exe_result" jdbcType="VARCHAR" property="exeResult"/>
+        <result column="task_type" jdbcType="VARCHAR" property="taskType"/>
+        <result column="task_commend" jdbcType="VARCHAR" property="exeComment"/>
+        <result column="executor" jdbcType="VARCHAR" property="executor"/>
+        <result column="apprOpName" jdbcType="VARCHAR" property="apprOpName"/>
+        <result column="apprEventTypeCd" jdbcType="VARCHAR" property="apprEventTypeCd"/>
+    </resultMap>
+
+    <select id="qryTasksHisListCnt" parameterType="org.jeecg.modules.activiti.entity.ActivitiHisEntity"
+            resultType="java.lang.Integer">
+        select count(1)
+        from act_hi_procinst a
+        where 1 = 1
+        <if test="apprEventTypeCd != null">
+            and get_proc_inst_id(a.proc_def_id_) = #{apprEventTypeCd,jdbcType=VARCHAR}
+        </if>
+
+        <if test="exeBeginTime != null">
+            and a.start_time_  <![CDATA[ >= ]]> to_date(#{exeBeginTime,jdbcType=VARCHAR},'YYYY-MM-DD')
+        </if>
+
+        <if test="exeEndTime != null">
+            and a.start_time_  <![CDATA[ <= ]]> to_date(#{exeEndTime,jdbcType=VARCHAR},'YYYY-MM-DD') + 1 - 0.00001
+        </if>
+        and a.end_time_ is not null
+    </select>
+
+    <select id="qryTasksHisList" parameterType="org.jeecg.modules.activiti.entity.ActivitiHisEntity"
+            resultMap="taskHisResultMap">
+        select q.* FROM
+        (
+        select a.PROC_INST_ID_ proc_inst_id,
+        (select z.task_comment from act_hi_taskinst b,act_bz_trace z where a.proc_inst_id_ = b.proc_inst_id_ and b.id_ =
+        z.task_id order by z.task_id LIMIT 1) task_commend,
+        get_proc_inst_id(a.proc_def_id_) task_name,
+        (select d.realname from act_hi_taskinst b,act_bz_trace z,sys_user d where a.proc_inst_id_ = b.proc_inst_id_ and b.id_ = z.task_id and d.id = z.op_code order by a.proc_inst_id_ LIMIT 1) apprOpName,
+        date_format(start_time_,'%Y-%m-%d%H:%i:%S') start_time,
+        date_format(end_time_,'%Y-%m-%d%H:%i:%S') end_time,
+        (select c.act_name_ from act_hi_actinst c where c.proc_inst_id_ = a.proc_inst_id_ and c.act_type_ =
+        'serviceTask') exe_result,
+        get_proc_inst_id(a.proc_def_id_)  apprEventTypeCd
+        from act_hi_procinst a
+        where 1 = 1
+        <if test="apprEventTypeCd != null">
+            and get_proc_inst_id(a.proc_def_id_) = #{apprEventTypeCd,jdbcType=VARCHAR}
+        </if>
+
+        <if test="exeBeginTime != null">
+            and a.start_time_  <![CDATA[ >= ]]> to_date(#{exeBeginTime,jdbcType=VARCHAR},'YYYY-MM-DD')
+        </if>
+
+        <if test="exeEndTime != null">
+            and a.start_time_  <![CDATA[ <= ]]> to_date(#{exeEndTime,jdbcType=VARCHAR},'YYYY-MM-DD') + 1 - 0.00001
+        </if>
+        and a.end_time_ is not null
+        order by a.start_time_ desc
+        ) q
+    </select>
+
+    <select id="qryTasksHisChildList" parameterType="org.jeecg.modules.activiti.entity.ActivitiHisEntity"
+            resultMap="taskHisResultMap">
+       select to_char(a.name_) task_type,
+              (select d.realname from security_user d,act_bz_trace e where e.task_id = a.id_ and  d.id = e.assignee and rownum = 1) executor,
+               to_char(b.message_)  task_commend,
+               to_char(a.claim_time_,'YYYY-MM-DD hh24:mi:ss') start_time
+         from act_hi_taskinst a,act_hi_comment b
+        where a.id_ = b.task_id_
+          and a.proc_inst_id_ = #{processInstanceId,jdbcType=VARCHAR}
+        union all
+        select to_char('流程发起') task_type,
+               (select d.realname from security_user d where d.id = b.assignee) executor,
+               to_char('流程发起') task_commend,
+               to_char(b.op_time,'YYYY-MM-DD hh24:mi:ss') start_time
+         from act_hi_taskinst  a left join act_bz_trace b on a.id_ = b.task_id
+         where a.proc_inst_id_ = #{processInstanceId,jdbcType=VARCHAR}
+         order by start_time desc
+    </select>
+
+    <select id="qryFirstTaskByInstId" parameterType="java.lang.String"
+            resultType="org.jeecg.modules.activiti.entity.ActivitiHisEntity">
+        select '流程发起' taskName,
+               (select d.realname from security_user d where d.id = b.assignee) executor,
+               to_char('流程发起') exeComment,
+               to_char(b.op_time,'YYYY-MM-DD hh24:mi:ss') exeTime
+         from act_hi_taskinst  a left join act_bz_trace b on a.id_ = b.task_id
+         where a.proc_inst_id_ = #{processInstanceId,jdbcType=VARCHAR}
+    </select>
+
+    <update id="saveActBzTaskTrace" parameterType="org.jeecg.modules.activiti.entity.TaskInfoEntity">
+        insert into ACT_BZ_TASK_TRACE(TASK_ID,TASK_STATUS,
+        <if test="opCode!=null">
+            OPCODE,
+        </if>
+        VERSION,REMARK)
+        values(#{taskId},#{taskStatus},
+        <if test="opCode!=null">
+            #{opCode},
+        </if>
+        NOW(),#{remark})
+    </update>
+
+    <insert id="saveActBzTask" parameterType="org.jeecg.modules.activiti.entity.TaskInfoEntity">
+        replace into ACT_BZ_TASK (task_id,
+        task_type,
+        task_status,
+        exam_order_id,
+        remark,
+        sample_code,
+        opcode,
+        version,
+        create_Dt,
+        task_name)
+        VALUES (#{taskId},
+        #{taskType},
+        #{taskStatus},
+        #{examOrderId},
+        #{remark},
+        #{sampleCode},
+        #{opCode},
+        NOW(),
+        NOW(),
+        #{taskName})
+    </insert>
+
+    <select id="qryActStepMethodList" parameterType="java.lang.String"
+            resultType="org.jeecg.modules.activiti.entity.ActStepConfigEntity">
+        select t.config_id     configId,
+               t.process_id    processId,
+               t.activity_id   activityId,
+               t.activity_name activityName,
+               t.step_id       stepId,
+               t.step_name     stepName,
+               t.step_seq      stepSeq,
+               t.is_show       isShow
+          from act_step_config t
+         where t.process_id = #{processKey}
+         order by step_seq
+    </select>
+    <select id="qryStepMethodDefList" parameterType="java.lang.String"
+            resultType="org.jeecg.modules.activiti.entity.StepMethodDefEntity">
+        select t.step_id       stepId,
+               t.step_name     stepName,
+               t.invoke_method invokeMethod,
+               t.invoke_seq    invokeSeq,
+               t.method_desc   methodDesc
+          from step_method_def t
+         where t.step_id in (select a.step_id
+                               from act_step_config a
+                              where a.process_id = #{processKey})
+         order by t.invoke_seq
+    </select>
+</mapper>
