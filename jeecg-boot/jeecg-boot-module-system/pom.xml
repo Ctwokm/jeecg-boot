@@ -34,6 +34,13 @@
 			<groupId>org.jeecgframework.boot</groupId>
 			<artifactId>jeecg-system-local-api</artifactId>
 		</dependency>
+		<!-- 打包时只需要在这里引入需要打包的业务包即可，例如：打包河源的智能燃料，只需要引入znrl-hy即可 -->
+		<dependency>
+			<groupId>org.jeecgframework.boot</groupId>
+			<artifactId>jeecg-boot-module-znrl-hy</artifactId>
+			<version>${jeecgboot.version}</version>
+		</dependency>
+		<!-- 正式环境可去掉下方 -->
 		<dependency>
 			<groupId>org.jeecgframework.boot</groupId>
 			<artifactId>jeecg-boot-module-demo</artifactId>

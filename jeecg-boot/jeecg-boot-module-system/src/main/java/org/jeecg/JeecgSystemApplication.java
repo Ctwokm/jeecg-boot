@@ -1,5 +1,6 @@
 package org.jeecg;
 
+import com.bstek.ureport.console.UReportServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.StandardJarScanner;
