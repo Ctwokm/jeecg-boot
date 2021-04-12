@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.rapid.mapper.ErrorSpecMapper">
+
+
+    <insert id="add" parameterType="org.jeecg.modules.rapid.entity.ErrorSpec" >
+        <selectKey resultType="int"  keyProperty="errorSpecId" order="BEFORE">
+            SELECT  seq_error_spec.nextval FROM DUAL
+        </selectKey>
+        INSERT INTO ERROR_SPEC
+          (ERROR_SPEC_ID,ERROR_CODE, ERROR_TITLE,  ERROR_SPEC, DEAL_METHOD,
+           MACHIN_CODE, STATE, FLOW_ID,CREATE_TIME)
+        VALUES
+          (#{errorSpecId,jdbcType=VARCHAR},#{errorCode,jdbcType=VARCHAR}, #{errorTitle,jdbcType=VARCHAR}, #{errorSpec,jdbcType=VARCHAR}, #{dealMethod,jdbcType=VARCHAR},
+           #{machinCode,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, #{flowId,jdbcType=VARCHAR},SYSDATE)
+    </insert>
+
+    <update id="editById" parameterType="org.jeecg.modules.rapid.entity.ErrorSpec" >
+        UPDATE ERROR_SPEC
+        SET ERROR_TITLE=#{errorTitle,jdbcType=VARCHAR},ERROR_SPEC=#{errorSpec,jdbcType=VARCHAR},DEAL_METHOD=#{dealMethod,jdbcType=VARCHAR},
+        MACHIN_CODE=#{machinCode,jdbcType=VARCHAR},STATE=#{state,jdbcType=VARCHAR},FLOW_ID=#{flowId,jdbcType=VARCHAR},ERROR_CODE = #{errorCode,jdbcType=VARCHAR}
+        WHERE ERROR_SPEC_ID = #{errorSpecId,jdbcType=VARCHAR}
+    </update>
+
+    <update id="deleteErrorById" parameterType="String" >
+        DELETE FROM ERROR_SPEC
+        WHERE ERROR_SPEC_ID = #{errorSpecId,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

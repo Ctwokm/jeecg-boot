@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.BizToolMapper">
+
+    <!--  查询结果不分页  -->
+    <select id="query"  resultType="java.util.HashMap">
+
+        <if test="sqlId != null and sqlId =='abc'.toString() ">
+            select * from sys_role
+        </if>
+
+        <if test="sqlId != null and sqlId =='123'.toString() ">
+            select * from sys_user_role
+        </if>
+
+    </select>
+    <!--  查询结果根据参数判断是否分页  -->
+    <select id="queryByPage"  resultType="java.util.HashMap">
+
+
+        <if test="params.sqlId != null and params.sqlId =='abc'.toString() ">
+            select * from sys_role
+        </if>
+
+
+        <if test="params.sqlId != null and params.sqlId =='123'.toString() ">
+            select * from sys_user_role a
+            where 1 = 1
+            <if test="params.role_id != '' and params.role_id != null" >
+                and a.role_id = #{params.role_id,jdbcType=VARCHAR}
+            </if>
+
+        </if>
+
+
+        <if test="params.sqlId != null and params.sqlId =='qryTrainBasicListByPage'.toString() ">
+
+            select t.train_no trainNo,
+            t.train_no trainNoAlias,
+            t.car_cnt carCnt,
+            t.total_net_qty totalNetQty,
+            t.total_mz_qty totalMzQty,
+            t.total_tick_qty totalTickQty,
+            t.total_kud_qty totalKudQty,
+            t.total_yd_qty totalYdQty,
+            t.total_loss_qty totalLossQty,
+            (select date_format(b.record_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b  where b.train_no = t.train_no order by b.record_dtm LIMIT 1) recordDtm,
+            t.leave_dtm leaveDtm,
+            (select c.remark from RLRECORDMSTHY c where c.train_no = t.train_no order by c.remark LIMIT 1) remark
+            from (select a.train_no,
+            (select date_format(b.record_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b where b.train_no = a.train_no order by b.record_dtm LIMIT 1) record_dtm,
+            (select date_format(b.leave_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b where b.train_no = a.train_no order by b.leave_dtm LIMIT 1) leave_dtm,
+            count(1) car_cnt,
+            ROUND(IFNULL(sum(a.net_qty), 0)/1000,3) total_net_qty,
+            ROUND(IFNULL(sum(a.mz_qty), 0)/1000,3) total_mz_qty,
+            ROUND(IFNULL(sum(a.tick_qty), 0)/1000,3) total_tick_qty,
+            ROUND(IFNULL(sum(a.kud_qty), 0)/1000,3) total_kud_qty,
+            ROUND(IFNULL(sum(a.yd_qty), 0)/1000,3) total_yd_qty,
+            ROUND(IFNULL(sum(a.loss_qty), 0)/1000,3) total_loss_qty
+            from RLRECORDMSTHY a
+            where 1 = 1
+
+            <if test="params.trainNo != '' and params.trainNo != null" >
+                and a.train_no = #{params.trainNo,jdbcType=VARCHAR}
+            </if>
+
+            <if test=" params.beginTime != '' and params.beginTime != null" >
+                <![CDATA[
+             and a.record_dtm >= str_to_date(#{params.beginTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%S')
+             ]]>
+            </if>
+            <if test=" params.endTime != '' and params.endTime != null " >
+                <![CDATA[
+             and a.record_dtm <= str_to_date(#{params.endTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%S') + 1 - 0.00001
+             ]]>
+            </if>
+            group by a.train_no) t
+            order by t.record_dtm desc
+
+        </if>
+        /*查询注册的车信息*/
+        <if test="params.sqlId != null and params.sqlId =='qryRegisteredCarListByPage'.toString() ">
+
+            SELECT (a.rec_id) recId,
+            a.card_id cardId,
+            a.card_typ cardTyp,
+            (CASE a.card_typ when '1' then '普通卡' when '2' then '临时卡' end) as cardTypeName,
+            a.car_id carId,
+            a.backcar_id backCarId,
+            (case a.trans_typ when  '0' then  '煤车' when  '1' then  '灰车' when '2' then  '其它' when '5' then '厂内倒运煤' end ) as transTypeName,
+            a.org_no orgNo,
+            (select ci.carrier_name
+            from CARRIER_INFO ci
+            where ci.CARRIER_NO =  (a.org_no)) carrierName,
+            (case a.car_typ when  '0' then '半挂' when '1' then '外挂' end ) as carTypeName,
+            a.car_typ carTyp,
+            a.valid_sta validSta,
+            (case a.valid_sta when '0' then '无效' when '1' then '有效'end ) as statusName,
+            a.protocol_sta protocolSta,
+            a.car1_length,
+            a.car1_width,
+            a.car1tof_length,
+            a.std_qty,
+            date_format(a.reg_dtm, '%Y-%m-%d') regDtm,
+            date_format(a.end_dtm, '%Y-%m-%d') endDtm,
+            -- a.car_driver,
+            (select aa.realname
+            from sys_user aa
+            where aa.id = a.fstusr_id) opCode,
+            (select aa.realname
+            from sys_user aa
+            where aa.id = a.lstusr_id) updateCode
+            FROM RLCARMST a
+            where 1=1
+            <if test="params.validSta != null and params.validSta != ''" >
+                and a.valid_sta = #{params.validSta,jdbcType=VARCHAR}
+            </if>
+
+            <if test="params.carId != null and params.carId != ''" >
+                and a.car_id = #{params.carId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="params.cardId != null and params.cardId != ''" >
+                and a.card_id = #{params.cardId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="params.beginTime != null and params.beginTime != ''" >
+                and a.reg_dtm <![CDATA[     >=     ]]> str_to_date(#{params.beginTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+            </if>
+
+            <if test="params.endTime != null and params.endTime != ''" >
+                and a.reg_dtm <![CDATA[     <     ]]> str_to_date(#{params.endTime,jdbcType=VARCHAR}, '%Y-%m-%d')+1
+            </if>
+
+            <if test="params.protocolSta != null and params.protocolSta != ''" >
+                and a.protocol_sta = #{params.protocolSta,jdbcType=VARCHAR}
+            </if>
+            order by a.reg_dtm desc
+            </if>
+        /*查询车辆锁车记录*/
+        <if test="params.sqlId != null and params.sqlId =='qryLockCarList'.toString() ">
+            select a.lock_rec_id,
+            a.rec_id,
+            (case a.status when '0' then '已生效' when '1'then'已失效' end ) status,
+            pre_kd_flag,
+            pre_kd_qty,
+            a.eff_time effTime,
+            a.exp_time expTime,
+            a.reason,
+            a.remark,
+            (select realname from sys_user where user_id = (a.op_code)) opCode,
+            (select realname from sys_user where user_id = (a.update_code)) updateCode,
+            a.insert_time insertTime,
+            a.update_time updateTime,
+            a.car_id carId
+            from car_lock_rec a
+            where 1 = 1
+            <if test="params.carId != null and params.carId != '' ">
+                and a.car_id = #{params.carId,jdbcType=VARCHAR}
+            </if>
+            order by a.insert_time desc
+        </if>
+
+    </select>
+
+
+    <resultMap id="pkgEntity" type="org.jeecg.modules.business.vo.PkgEntity">
+        <result column="pkgName" jdbcType="VARCHAR" property="pkgName"/>
+        <result column="jsonString" jdbcType="VARCHAR" property="jsonString"/>
+        <result column="opCode" jdbcType="VARCHAR" property="opCode"/>
+        <result column="resInfo" jdbcType="VARCHAR" property="resInfo"/>
+        <result column="resCode" jdbcType="VARCHAR" property="resCode"/>
+        <result column="resMsg" jdbcType="VARCHAR" property="resMsg"/>
+    </resultMap>
+
+    <select id="doCall" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.PkgEntity" resultMap="pkgEntity">
+
+        {call ${pkgName}(
+            #{jsonString,mode=IN,jdbcType=VARCHAR},
+            #{opCode,mode=IN,jdbcType=VARCHAR},
+            #{resInfo,mode=OUT,jdbcType=VARCHAR},
+            #{resCode,mode=OUT,jdbcType=VARCHAR},
+            #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+
+    </select>
+
+</mapper>

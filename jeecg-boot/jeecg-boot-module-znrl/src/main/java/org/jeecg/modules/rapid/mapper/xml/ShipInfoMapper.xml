@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.rapid.mapper.ShipInfoMapper">
+
+    <insert id="add" parameterType="org.jeecg.modules.rapid.entity.ShipInfo">
+        <selectKey resultType="int"  keyProperty="shipId" order="BEFORE">
+            SELECT  seq_ship_info.nextval FROM DUAL
+        </selectKey>
+                  insert into SHIP_INFO
+                            (SHIP_ID,
+                            SHIP_NAME,
+                            SHIP_ENG_NAME,
+                            SHIP_CODE,
+                            FIX_SHIP_NO,
+                            CABIN_CNT,
+                            LOAD_TUN,
+                            TOTAL_TUN,
+                            WIDTH,
+                            LENGTH,
+                            NATION_CD,
+                            COMPANY_NO,
+                            REMARK,
+                            STATUS,
+                            CREATE_TIME
+        )
+                  values (
+                            #{shipId,jdbcType=VARCHAR},
+                            #{shipName,jdbcType=VARCHAR},
+                            #{shipEngName,jdbcType=VARCHAR},
+                            #{shipCode,jdbcType=VARCHAR},
+                            #{fixShipNo,jdbcType=VARCHAR},
+                            #{cabinCnt,jdbcType=VARCHAR},
+                            #{loadTun,jdbcType=VARCHAR},
+                            #{totalTun,jdbcType=VARCHAR},
+                            #{width,jdbcType=VARCHAR},
+                            #{length,jdbcType=VARCHAR},
+                            #{nationCd,jdbcType=VARCHAR},
+                            #{companyNo,jdbcType=VARCHAR},
+                            #{remark,jdbcType=VARCHAR},
+                            1,
+                            sysdate
+                    )
+    </insert>
+
+
+    <delete id="deteleByid" parameterType="String">
+        delete from ship_info where ship_id = #{shipId,jdbcType=VARCHAR}
+    </delete>
+
+    <update id="editById" parameterType="org.jeecg.modules.rapid.entity.ShipInfo">
+        update ship_info set
+               SHIP_NAME = #{shipName,jdbcType=VARCHAR},
+               SHIP_ENG_NAME = #{shipEngName,jdbcType=VARCHAR},
+               SHIP_CODE = #{shipCode,jdbcType=VARCHAR},
+               FIX_SHIP_NO = #{fixShipNo,jdbcType=VARCHAR},
+               CABIN_CNT = #{cabinCnt,jdbcType=VARCHAR},
+               LOAD_TUN = #{loadTun,jdbcType=VARCHAR},
+               TOTAL_TUN = #{totalTun,jdbcType=VARCHAR},
+               WIDTH = #{width,jdbcType=VARCHAR},
+               LENGTH= #{length,jdbcType=VARCHAR},
+               NATION_CD = #{nationCd,jdbcType=VARCHAR},
+               COMPANY_NO = #{companyNo,jdbcType=VARCHAR}
+        where ship_id = #{shipId,jdbcType=VARCHAR}
+    </update>
+</mapper>

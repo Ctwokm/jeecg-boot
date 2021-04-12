@@ -1,0 +1,718 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.CarInfoMapper">
+
+    <sql id="paging_top_sql">
+        select * from (
+    </sql>
+
+    <sql id="paging_bottom_sql">
+        ) t where t.rownumber between #{beginRowIndex,jdbcType=INTEGER} and #{endRowIndex,jdbcType=INTEGER}
+    </sql>
+
+    <resultMap id="CarTransRecordResultMap" type="org.jeecg.modules.business.vo.CarTransRecordEntity">
+        <id column="record_no" jdbcType="INTEGER" property="recordNo" />
+        <result column="car_batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="card_id" jdbcType="VARCHAR" property="cardId" />
+        <result column="car_id" jdbcType="VARCHAR" property="carId" />
+        <result column="card_typ" jdbcType="VARCHAR" property="cardTyp" />
+        <result column="card_type_name" jdbcType="VARCHAR" property="cardTypeName" />
+        <result column="car_typ" jdbcType="VARCHAR" property="carTyp" />
+        <result column="car_type_name" jdbcType="VARCHAR" property="carTypeName" />
+        <result column="carrier_no" jdbcType="VARCHAR" property="orgNo" />
+        <result column="carrier_nam" jdbcType="VARCHAR" property="carrierName" />
+        <result column="ven_no" jdbcType="VARCHAR" property="venNo" />
+        <result column="ven_nam" jdbcType="VARCHAR" property="venName" />
+        <result column="coal_no" jdbcType="VARCHAR" property="coalNo" />
+        <result column="coal_nam" jdbcType="VARCHAR" property="coalName" />
+        <result column="coal_water" jdbcType="VARCHAR" property="coalWater" />
+        <result column="coal_water_name" jdbcType="VARCHAR" property="coalWaterName" />
+        <result column="colry_no" jdbcType="VARCHAR" property="mineNo" />
+        <result column="colry_nam" jdbcType="VARCHAR" property="colryName" />
+        <result column="tick_no" jdbcType="VARCHAR" property="tickNo" />
+        <result column="tick_qty" jdbcType="VARCHAR" property="tickQty" />
+        <result column="tick_pz_qty" jdbcType="VARCHAR" property="tickPzQty" />
+        <result column="tick_mz_qty" jdbcType="VARCHAR" property="tickMzQty" />
+        <result column="record_dtm" jdbcType="VARCHAR" property="recordDtm" />
+        <result column="cz_dtm" jdbcType="VARCHAR" property="czDtm"/>
+        <result column="sample_typ" jdbcType="VARCHAR" property="sampleTyp" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="mz_qty" jdbcType="VARCHAR" property="mzQty" />
+        <result column="pz_qty" jdbcType="VARCHAR" property="pzQty" />
+        <result column="net_qty" jdbcType="VARCHAR" property="netQty" />
+        <result column="kd_qty" jdbcType="VARCHAR" property="kdQty" />
+        <result column="cyj_no" jdbcType="VARCHAR" property="cyjNo" />
+        <result column="channel" jdbcType="VARCHAR" property="channel" />
+        <result column="man_check_sample" jdbcType="VARCHAR" property="manCheckSample" />
+        <result column="attach_batch_no" jdbcType="VARCHAR" property="attachBatchNo" />
+        <result column="action_tag" jdbcType="VARCHAR" property="actionTag" />
+        <result column="read_tag" jdbcType="VARCHAR" property="readTag" />
+        <result column="gh_index" jdbcType="VARCHAR" property="ghIndex" />
+        <result column="start_place" jdbcType="VARCHAR" property="startPlace" />
+        <result column="final_place" jdbcType="VARCHAR" property="finalPlace" />
+        <result column="start_name" jdbcType="VARCHAR" property="startName" />
+        <result column="final_name" jdbcType="VARCHAR" property="finalName" />
+        <result column="sample_dtm" jdbcType="VARCHAR" property="sampleDtm" />
+        <result column="jq_dtm" jdbcType="VARCHAR" property="jqDtm"/>
+        <result column="carStatus" jdbcType="VARCHAR" property="carStatus"/>
+        <result column="total_mz_qty" jdbcType="VARCHAR" property="totalMzQty" />
+        <result column="total_pz_qty" jdbcType="VARCHAR" property="totalPzQty" />
+        <result column="total_net_qty" jdbcType="VARCHAR" property="totalNetQty" />
+        <result column="total_kd_qty" jdbcType="VARCHAR" property="totalKdQty" />
+        <result column="total_tick_qty" jdbcType="VARCHAR" property="totalTickQty" />
+        <result column="total_entry_cnt" jdbcType="VARCHAR" property="totalEntryCnt" />
+    </resultMap>
+
+    <!--车辆类型map模板-->
+    <resultMap id="CarTransListResultMap" type="org.jeecg.modules.business.vo.CarInCoalEntity">
+
+    </resultMap>
+
+    <resultMap id="CarInfoResultMap" type="org.jeecg.modules.business.vo.CarInfoRegisterEntity">
+    </resultMap>
+
+    <resultMap id="RegisteredCarResultMap" type="org.jeecg.modules.business.vo.CarInfoEntity">
+        <id column="rec_id" jdbcType="VARCHAR" property="recId" />
+        <result column="card_id" jdbcType="VARCHAR" property="cardId" />
+        <result column="card_typ" jdbcType="VARCHAR" property="cardTyp" />
+        <result column="card_type_name" jdbcType="VARCHAR" property="cardTypeName" />
+        <result column="car_id" jdbcType="VARCHAR" property="carId" />
+        <result column="backcar_id" jdbcType="VARCHAR" property="backCarId" />
+        <result column="trans_type_name" jdbcType="VARCHAR" property="transTypeName" />
+        <result column="org_no" jdbcType="VARCHAR" property="orgNo" />
+        <result column="carrier_name" jdbcType="VARCHAR" property="orgName" />
+        <result column="car_typ" jdbcType="VARCHAR" property="carTyp" />
+        <result column="valid_sta" jdbcType="VARCHAR" property="validSta" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="protocol_sta" jdbcType="VARCHAR" property="protocolSta" />
+        <result column="car_driver" jdbcType="VARCHAR" property="carDriver" />
+        <result column="car1_length" jdbcType="VARCHAR" property="car1Length" />
+        <result column="car1_width" jdbcType="VARCHAR" property="car1Width" />
+        <result column="car1tof_length" jdbcType="VARCHAR" property="car1ToFLength" />
+        <result column="car_type_name" jdbcType="VARCHAR" property="carTypeName" />
+        <result column="std_qty" jdbcType="VARCHAR" property="stdQty" />
+        <result column="reg_dtm" jdbcType="VARCHAR" property="regDtm" />
+        <result column="end_dtm" jdbcType="VARCHAR" property="endDtm" />
+        <result column="op_code" jdbcType="VARCHAR" property="fstUsrId" />
+        <result column="update_code" jdbcType="VARCHAR" property="lstUsrId" />
+    </resultMap>
+
+    <!--查询汽车来煤信息——jj模板-->
+    <select id="qryCarTransRecordList" parameterType="org.jeecg.modules.business.vo.CarTransRecordEntity"  resultMap="CarTransRecordResultMap" >
+        <!--<include refid="paging_top_sql" />-->
+        SELECT
+        m.*
+        FROM
+        (
+        SELECT
+        a.record_no,
+        a.car_batch_no,
+        a.card_id,
+        (
+        SELECT
+        b.card_typ
+        FROM
+        rlcarmst b
+        WHERE
+        b.card_id = a.card_id
+        LIMIT 1
+        ) card_typ,
+        (
+        SELECT
+        b.card_typ
+        FROM
+        rlcarmst b
+        WHERE
+        b.card_id = a.card_id
+        LIMIT 1
+        ) card_type_name,
+        (
+        SELECT
+        b.car_typ
+        FROM
+        rlcarmst b
+        WHERE
+        b.card_id = a.card_id
+        LIMIT 1
+        ) car_typ,
+        (
+        SELECT
+        b.car_typ
+        FROM
+        rlcarmst b
+        WHERE
+        b.card_id = a.card_id
+        LIMIT 1
+        ) car_type_name,
+
+        a.car_id,
+        a.carrier_no,
+        (
+        SELECT
+        ci.carrier_name
+        FROM
+        CARRIER_INFO ci
+        WHERE
+        ci.carrier_no = a.carrier_no
+        ) carrier_nam,
+        a.ven_no,
+        (
+        SELECT
+        vi.ven_name
+        FROM
+        VENDOR_INFO vi
+        WHERE
+        vi.ven_no = a.ven_no
+        ) ven_nam,
+        a.coal_no,
+        (
+        SELECT
+        ct.coal_name
+        FROM
+        COAL_TYPE ct
+        WHERE
+        ct.coal_no = CAST(a.coal_no AS CHAR(10))
+        ) coal_nam,
+        a.colry_no,
+        (
+        SELECT
+        cm.mine_name
+        FROM
+        COAL_MINE cm
+        WHERE
+        cm.mine_no = a.colry_no
+        ) colry_nam,
+        a.coal_water,
+        (a.coal_water) coal_water_name,
+
+        a.tick_no,
+        a.tick_qty / 1000 tick_qty,
+        a.tick_pz_qty / 1000 tick_pz_qty,
+        a.tick_mz_qty / 1000 tick_mz_qty,
+
+        a.record_dtm,
+
+
+        a.cz_dtm,
+
+
+        a.jq_dtm,
+
+        (
+        SELECT
+
+        end_time
+
+
+        FROM
+        take_sample_rec
+        WHERE
+        record_no = a.record_no
+        LIMIT 1
+        ) sample_dtm,
+        a.sample_typ,
+        a.cyj_no,
+        (a.cyj_no) channel,
+
+        (
+        getCarStatusInfo (a.record_no)
+        ) carStatus,
+
+        remark,
+        a.mz_qty / 1000 mz_qty,
+        a.pz_qty / 1000 pz_qty,
+        a.net_qty / 1000 net_qty,
+        a.kd_qty / 1000 kd_qty,
+        IFNULL(a.attach_batch_no, '0') man_check_sample,
+
+        a.attach_batch_no
+        FROM
+        RLRECORDMSTQY a
+        WHERE
+        1 = 1
+
+        <if test="carTransRecordEntity.carId != null" >
+            and a.car_id like #{carTransRecordEntity.carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carTransRecordEntity.cardId != null" >
+            and a.card_id like #{carTransRecordEntity.cardId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carTransRecordEntity.beginTime != null" >
+            and a.record_dtm <![CDATA[     >=     ]]> STR_TO_DATE(#{carTransRecordEntity.beginTime,jdbcType=VARCHAR}, '%Y/%m/%d')
+        </if>
+
+        <if test="carTransRecordEntity.endTime != null" >
+            and a.record_dtm <![CDATA[     <     ]]> STR_TO_DATE(#{carTransRecordEntity.endTime,jdbcType=VARCHAR}, '%Y/%m/%d')+1
+        </if>
+
+     <!--   <if test="beginTime == null" >
+            and a.record_dtm <![CDATA[     >=     ]]> sysdate-7
+        </if>
+
+        <if test="endTime == null" >
+            and a.record_dtm <![CDATA[     <     ]]> sysdate
+        </if>-->
+
+        <if test="carTransRecordEntity.batchNo != null" >
+            and a.car_batch_no like #{carTransRecordEntity.batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carTransRecordEntity.mineNo != null" >
+            and a.colry_no = #{carTransRecordEntity.mineNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "batchNo"' >
+            order by  car_batch_no  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "carId"' >
+            order by  car_id  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "mineNo"' >
+            order by  colry_no  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "channel"' >
+            order by  cyj_no  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "mzQty"' >
+            order by  mz_qty  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "pzQty"' >
+            order by  pz_qty  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "kdQty"' >
+            order by  kd_qty  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "netQty"' >
+            order by  net_qty  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "recordDtm"' >
+            order by  record_dtm  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "czDtm"' >
+            order by  cz_dtm  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "carTransRecordEntity.jqDtm"' >
+            order by  jq_dtm  ${carTransRecordEntity.order}
+        </if>
+
+        <if test='carTransRecordEntity.order != null and carTransRecordEntity.sort == "sampleDtm"' >
+            order by  sample_dtm  ${carTransRecordEntity.order}
+        </if>
+
+        ) m
+
+        <!--<include refid="paging_bottom_sql" />-->
+    </select>
+
+    <!--查询汽车来煤信息——cg模板-->
+    <select id="qryCarInCoalList"   parameterType="org.jeecg.modules.business.vo.CarInCoalEntity" resultMap="CarTransListResultMap">
+        select t.record_no,
+        t.car_batch_no,
+        t.tick_no,
+        t.car_id,
+        SUBSTR(t.card_id, -6) as card_id,
+        t.ven_no,
+        (select a.ven_name from vendor_info a where a.ven_no=t.ven_no) ven_name,
+        t.coal_no,
+        (select b.coal_name from coal_type b where b.coal_no=t.coal_no) coal_name,
+        t.colry_no,
+        (select c.mine_name from coal_mine c where c.mine_no=t.colry_no) mine_name,
+        t.carrier_no,
+        (select d.carrier_name from carrier_info d where d.carrier_no=t.carrier_no) carrier_name,
+        round(t.mz_qty,3) mz_qty,
+        round(t.pz_qty,3) pz_qty,
+        round(abs(t.net_qty),3) net_qty,
+        t.tick_qty,
+        t.kd_qty,
+        t.coal_water,
+        t.sample_typ,
+        t.record_dtm,
+        t.cz_dtm,
+        t.jq_dtm,
+        t.remark,
+        t.status,
+        (select c.contract_code from contract_info c where c.contract_id = t.contract_code ) first_num,
+        t.contract_code,
+        t.sample_code,
+        t.cyj_no,
+        c.trans_typ,
+        t.leave_flg,
+        (select name from dictionary_table where status = '0'  and type = 'XM_AREA' and id =t.xm_area ) xm_area
+        from rlrecordmstqy t
+        left join rlcarmst c
+        on t.card_id = c.card_id
+        where 1=1
+        and t.status = '0'
+        <if test="carInCoalEntity.mineName != null" >
+            and t.colry_no = #{carInCoalEntity.mineName}
+        </if>
+        <if test="carInCoalEntity.beginTime != null">
+            and t.record_dtm <![CDATA[     >=     ]]> STR_TO_DATE(#{carInCoalEntity.beginTime},'%Y/%m/%d %H/%i/%S')
+        </if>
+        <if test="carInCoalEntity.endTime != null">
+            and t.record_dtm <![CDATA[     <      ]]> STR_TO_DATE(#{carInCoalEntity.endTime},'%Y/%m/%d %H/%i/%S')
+        </if>
+        <if test="carInCoalEntity.carId != null">
+            and t.car_id like '%'|| #{carInCoalEntity.carId}||'%'
+        </if>
+        <if test="carInCoalEntity.leaveFlg != null">
+            and t.leave_flg = #{carInCoalEntity.leaveFlg}
+        </if>
+        <if test="carInCoalEntity.sort != null ">
+            order by ${carInCoalEntity.sort}
+        </if>
+        <if test="carInCoalEntity.order != null ">
+            ${carInCoalEntity.order}
+        </if>
+    </select>
+
+    <!--删除车辆来煤信息——jj-->
+    <select id="deleteByCarInfo" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.CarTransRecordEntity">
+        {call pk_register.p_car_add_transRec(#{jsonString,mode=IN,jdbcType=VARCHAR},
+        #{recordNo,mode=OUT,jdbcType=VARCHAR},
+        #{batchNo,mode=OUT,jdbcType=VARCHAR},
+        #{resCode,mode=OUT,jdbcType=VARCHAR},
+        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+    <!--删除车辆来煤信息——cg-->
+    <select id="deleteByCar" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.CarTransRecordEntity">
+        {call pk_register.p_car_add_transRec(#{jsonString,mode=IN,jdbcType=VARCHAR},
+        #{recordNo,mode=OUT,jdbcType=VARCHAR},
+        #{batchNo,mode=OUT,jdbcType=VARCHAR},
+        #{resCode,mode=OUT,jdbcType=VARCHAR},
+        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <!--定位单个车辆-->
+    <select id="focusCar" parameterType="org.jeecg.modules.business.vo.CarInfoEntity" resultMap="RegisteredCarResultMap" >
+        SELECT to_char(a.rec_id) rec_id,
+        a.card_id,
+        a.card_typ,
+        decode(a.card_typ, '1', '普通卡', '2', '临时卡') card_type_name,
+        a.car_id,
+        backcar_id,
+        decode(a.trans_typ, '0', '煤车', '1', '灰车', '2', '其它') trans_type_name,
+        a.org_no,
+        (select ci.carrier_name
+        from CARRIER_INFO ci
+        where ci.CARRIER_NO = to_char(a.org_no)) carrier_name,
+        decode(a.car_typ, '0', '半挂', '1', '外挂') car_type_name,
+        to_char(a.std_qty) std_qty,
+        to_char(a.reg_dtm, 'yyyy-mm-dd') reg_dtm,
+        to_char(a.end_dtm, 'yyyy-mm-dd') end_dtm,
+        rownum rownumber
+        FROM RLCARMST a
+        where valid_sta = '1'
+        <if test="carId != null" >
+            and a.car_id = #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="cardId != null" >
+            and a.card_id = #{cardId,jdbcType=VARCHAR}
+        </if>
+        order by a.reg_dtm desc
+    </select>
+
+    <select id="addCarTransRecord" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.CarTransRecordEntity">
+        {call pk_register.p_car_add_transRec(#{jsonString,mode=IN,jdbcType=VARCHAR},
+        #{opCode,mode=IN,jdbcType=VARCHAR},
+        #{resInfo,mode=OUT,jdbcType=VARCHAR},
+        #{resCode,mode=OUT,jdbcType=VARCHAR},
+        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <!--汽车注册卡查询list-->
+    <select id="qryCarRegisterList" parameterType="org.jeecg.modules.business.vo.CarInfoRegisterEntity" resultMap="CarInfoResultMap">
+        SELECT
+        A .rec_id,
+        A .card_id,
+        A .card_typ,
+        A .car_id,
+        backcar_id,
+        A .trans_typ,
+        A .org_no,
+        (
+        SELECT
+        ci.carrier_name
+        FROM
+        CARRIER_INFO ci
+        WHERE
+        ci.CARRIER_NO = A .org_no
+        ) carrier_name,
+        A .car_typ,
+        A .valid_sta,
+        A .car1_length,
+        A .car1_width,
+        A .car1ntf_length,
+        A.car1tof_length,
+        A.car1l1tw_length,
+        A.car1l2tl1_length,
+        A.car1l3tl2_length,
+        A.car1l4tl3_length,
+        A.car1l5tl4_length,
+        A.car1l6tl5_length,
+        A.car1l7tl6_length,
+        A.CAR1L10TL9_LENGTH,
+        A.CAR1L11TL10_LENGTH,
+        round(A .std_qty) std_qty,
+        round(A .float_qty) float_qty,
+        A .reg_dtm,
+        A .end_dtm,
+        (
+        SELECT
+        aa.realname
+        FROM
+        sys_user aa
+        WHERE
+        aa.user_id = A .fstusr_id
+        ) op_code,
+        (
+        SELECT
+        aa.realname
+        FROM
+        sys_user aa
+        WHERE
+        aa.user_id = A .lstusr_id
+        ) update_code,
+        clr.status,
+        A .fstusr_dtm,
+        A .lstusr_dtm,
+        A .rmt_not
+        FROM
+        RLCARMST A left join
+        car_lock_rec clr
+        on  A .rec_id = clr.rec_id
+        WHERE
+        1 = 1
+        <if test="carInfoRegisterEntity.beginTime != null">
+            AND A .reg_dtm <![CDATA[     >=     ]]>  STR_TO_DATE (#{carInfoRegisterEntity.beginTime}, '%Y/%m/%d')
+        </if>
+        <if test="carInfoRegisterEntity.endTime != null">
+            AND A .reg_dtm <![CDATA[     <     ]]>   STR_TO_DATE (#{carInfoRegisterEntity.endTime}, '%Y/%m/%d') + 1
+        </if>
+        <if test="carInfoRegisterEntity.carId != null">
+            AND A .car_id =  #{carInfoRegisterEntity.carId}
+        </if>
+        <if test="carInfoRegisterEntity.validSta != null">
+            AND A .valid_sta = #{carInfoRegisterEntity.validSta}
+        </if>
+        <if test="carInfoRegisterEntity.carTyp != null">
+            AND A .car_typ = #{carInfoRegisterEntity.carTyp}
+        </if>
+
+        ORDER BY
+
+        A .reg_dtm  DESC
+    </select>
+
+    <!--矿卡注册查询List   /* AND a.mine_card_type = '101'*/ -->
+    <select id="qryMineCardList" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultMap="CarTransListResultMap">
+        SELECT
+        a.card_rec_id card_rec_id,
+        a.mine_card_id,
+        a.view_card_id,
+        a.ven_no,
+        (
+        SELECT
+        ai.ven_name
+        FROM
+        VENDOR_INFO ai
+        WHERE
+        ai.VEN_NO = (
+        SELECT
+        v.ven_no
+        FROM
+        vendor_mine_rel v
+        WHERE
+        v.mine_no = a.mine_no
+        LIMIT 1
+        )
+        ) ven_name,
+        a.carrier_no,
+        (
+        SELECT
+        bi.carrier_name
+        FROM
+        CARRIER_INFO bi
+        WHERE
+        bi.CARRIER_NO = a.carrier_no
+        ) carrier_name,
+        a.mine_no,
+        (
+        SELECT
+        ci.mine_name
+        FROM
+        COAL_MINE ci
+        WHERE
+        ci.MINE_NO =  a.mine_no
+        ) mine_name,
+        a.coal_no,
+        (
+        SELECT
+        di.coal_name
+        FROM
+        COAL_TYPE di
+        WHERE
+        di.COAL_NO = a.coal_no
+        ) coal_name,
+        STR_TO_DATE (a.eff_time, '%Y-%m-%d') eff_time,
+        STR_TO_DATE (a.exp_time, '%Y-%m-%d') exp_time,
+        a.valid_sta,
+        STR_TO_DATE (a.insert_time, '%Y-%m-%d') insert_time,
+        STR_TO_DATE (a.update_time, '%Y-%m-%d') update_time,
+        a.op_code,
+        a.update_code,
+        (
+        SELECT
+        s.realname
+        FROM
+        sys_user s
+        WHERE
+        s.user_id = a.op_code
+        ) op_name,
+        (
+        SELECT
+        t.realname
+        FROM
+        sys_user t
+        WHERE
+        t.user_id = a.update_code
+        ) update_name,
+        a.remark,
+        a.mine_card_type
+        FROM
+        MINE_CARD_INFO a
+        WHERE
+        1 = 1
+        <if test="registerEntity.mineCardId != null ">
+            and a.mine_card_id  = #{registerEntity.mineCardId}
+        </if>
+        <if test="registerEntity.mineNo != null">
+            and a.mine_no = #{registerEntity.mineNo}
+        </if>
+        <if test="registerEntity.effTime != null">
+            and a.insert_time <![CDATA[     >=     ]]> STR_TO_DATE(#{registerEntity.effTime}, '%Y/%m/%d')
+        </if>
+        <if test="registerEntity.expTime != null">
+            and a.insert_time <![CDATA[     <     ]]> STR_TO_DATE(#{registerEntity.expTime}, '%Y/%m/%d')+1-0.00001
+        </if>
+        <if test="registerEntity.sort != null ">
+            order by ${registerEntity.sort}
+        </if>
+        <if test="registerEntity.order != null ">
+            ${registerEntity.order}
+        </if>
+    </select>
+
+    <!--汽车矿卡修改方法update-->
+    <update id="modMineCardInfo" parameterType="org.jeecg.modules.business.vo.RegisterEntity" >
+        <if test="carNumber !=null">
+            update rlcarmst SET
+            vaild_sta = #{validSta,jdbcType=VARCHAR},
+            car_id = #{shipId,jdbcType=VARCHAR},
+            card_id = #{mineCardId,jdbcType=VARCHAR}
+            where car_id = #{shipId,jdbcType=VARCHAR}
+        </if>
+        <if test="carNumber == null">
+            update  MINE_CARD_INFO a
+            set a.mine_no = #{mineNo,jdbcType=VARCHAR},
+            a.coal_no= #{coalNo,jdbcType=VARCHAR},
+            a.eff_time = STR_TO_DATE(#{effTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%s'),
+            a.exp_time = STR_TO_DATE(#{expTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%s')+1-0.00001,
+            a.valid_sta = #{validSta,jdbcType=VARCHAR},
+            a.mine_card_type = #{mineCardType,jdbcType=VARCHAR},
+            a.remark = #{remark,jdbcType=VARCHAR}
+            where a.card_rec_id = #{cardRecId, jdbcType=VARCHAR}
+        </if>
+
+    </update>
+
+    <!--汽车矿卡新增的方法 insert-->
+    <insert id="addMineCardInfo" parameterType="org.jeecg.modules.business.vo.RegisterEntity" >
+        insert into MINE_CARD_INFO
+        (
+        mine_card_id,
+        view_card_id,
+        ven_no,
+        carrier_no,
+        mine_no,
+        coal_no,
+        eff_time,
+        exp_time,
+        valid_sta,
+        insert_time,
+        update_time,
+        op_code,
+        update_code,
+        remark,
+        mine_card_type,
+        ship_id)
+        values (
+        #{mineCardId,jdbcType=VARCHAR},
+        #{viewCardId,jdbcType=VARCHAR},
+        #{venNo,jdbcType=VARCHAR},
+        #{carrierNo,jdbcType=VARCHAR},
+        #{mineNo,jdbcType=VARCHAR},
+        #{coalNo,jdbcType=VARCHAR},
+        STR_TO_DATE(#{effTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%s'),
+        STR_TO_DATE(#{expTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%s')+1-0.00001,
+        #{validSta,jdbcType=VARCHAR},
+        sysdate(),
+        null,
+        #{opCode,jdbcType=VARCHAR},
+        null,
+        #{remark,jdbcType=VARCHAR},
+        #{mineCardType,jdbcType=VARCHAR},
+        NULL )
+    </insert>
+
+    <!--检查矿卡的方法是否存在-->
+    <select id="checkCard" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            mine_card_info t
+        WHERE
+            1 =1
+         <if test="mineCardId != null">
+             and  t.MINE_CARD_ID = #{mineCardId,jdbcType=VARCHAR}
+         </if>
+        AND t.VALID_STA = '1';
+    </select>
+
+    <!--矿卡作废的方法 insert+delete -->
+    <insert id="moveMsgToMineHis" parameterType="org.jeecg.modules.business.vo.RegisterEntity" >
+        insert into mine_card_info_his select * from mine_card_info t where 1=1
+         <if test="cardRecId ! =null">
+              and  t.card_rec_id = #{cardRecId}
+         </if>
+    </insert>
+    <delete id="deleteByMineCardId" parameterType="org.jeecg.modules.business.vo.RegisterEntity">
+        delete from mine_card_info  where card_rec_id = #{cardRecId}
+    </delete>
+
+    <!--采样点位发布点查询-->
+    <select id="queryPointList" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultType="java.lang.String">
+        select SAMPLE_AREAS from take_sample_rec t where 1 = 1
+        <if test="beginTime != null">
+            and t.insert_time <![CDATA[     >=     ]]> STR_TO_DATE(#{beginTime}, '%Y/%m/%d')
+        </if>
+        <if test="endTime != null">
+            and t.insert_time <![CDATA[     <     ]]> STR_TO_DATE(#{endTime}, '%Y/%m/%d')+1-0.00001
+        </if>
+        and t.insert_time  <![CDATA[     <     ]]>STR_TO_DATE('2020/08/28', '%Y/%m/%d')+1-0.00001
+    </select>
+
+</mapper>

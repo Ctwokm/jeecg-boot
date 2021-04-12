@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.CommonMapper">
+
+
+    <resultMap id="ConstResultMap" type="org.jeecg.modules.business.vo.ConstantEntity">
+        <result column="const_key" jdbcType="VARCHAR" property="key" />
+        <result column="const_value" jdbcType="VARCHAR" property="value" />
+    </resultMap>
+    <select id="qryConstantCfgData" resultMap="ConstResultMap" >
+          select a.const_key, a.const_value from constant_data_config a where a.is_effective = 'Y'
+  	</select>
+
+	<select id="qryLogMenuButtonInfo"  resultType="org.jeecg.modules.business.vo.ConstantEntity" >
+		select request_method key,oper_menu||','||oper_button value  from LOG_MENU_BUTTON_INFO
+	</select>
+</mapper>

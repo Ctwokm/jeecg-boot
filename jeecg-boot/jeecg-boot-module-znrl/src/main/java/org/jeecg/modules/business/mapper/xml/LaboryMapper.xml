@@ -1,0 +1,1602 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.LaboryMapper">
+  <sql id="paging_top_sql">
+   select * from (
+  </sql>
+
+  <sql id="paging_bottom_sql">
+   ) t where t.rownumber between #{beginRowIndex,jdbcType=INTEGER} and #{endRowIndex,jdbcType=INTEGER}
+  </sql>
+
+
+
+    <resultMap id="LabDataUploadCfgResultMap" type="org.jeecg.modules.business.vo.LabDataUploadEntity">
+        <result column="lab_cfg_id" jdbcType="VARCHAR" property="labCfgId" />
+        <result column="config_name" jdbcType="VARCHAR" property="configName" />
+        <result column="ip" jdbcType="VARCHAR" property="ip" />
+        <result column="db_driver" jdbcType="VARCHAR" property="dbDriver" />
+        <result column="db_linkurl" jdbcType="VARCHAR" property="dbLinkUrl" />
+        <result column="login_acct" jdbcType="VARCHAR" property="loginAcct" />
+        <result column="login_passwd" jdbcType="VARCHAR" property="loginPasswd" />
+        <result column="get_sql" jdbcType="VARCHAR" property="getSql" />
+        <result column="write_back_tag" jdbcType="VARCHAR" property="writeBackTag" />
+        <result column="write_back_sql" jdbcType="VARCHAR" property="writeBackSql" />
+        <result column="wb_param1_type" jdbcType="VARCHAR" property="wbParam1Type" />
+        <result column="wb_param2_type" jdbcType="VARCHAR" property="wbParam2Type" />
+        <result column="wb_param1_field" jdbcType="VARCHAR" property="wbParam1Field" />
+        <result column="wb_param2_field" jdbcType="VARCHAR" property="wbParam2Field" />
+        <result column="is_valid" jdbcType="VARCHAR" property="isValid" />
+        <result column="upload_rec_id" jdbcType="VARCHAR" property="uploadRecId" />
+        <result column="upload_cnt" jdbcType="VARCHAR" property="uploadCnt" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="is_succ" jdbcType="VARCHAR" property="isSucc" />
+        <result column="latest_op_time" jdbcType="VARCHAR" property="latestOpTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="device_no" jdbcType="VARCHAR" property="deviceNo" />
+        <result column="description" jdbcType="VARCHAR" property="dbType" />
+    </resultMap>
+
+
+    <select id="qryLabDataUploadCfg" parameterType="org.jeecg.modules.business.vo.LabDataUploadEntity"  resultMap="LabDataUploadCfgResultMap">
+            select a.lab_cfg_id,
+                    a.config_name,
+                    a.ip,
+                    a.db_driver,
+                    a.db_linkurl,
+                    a.login_acct,
+                    a.login_passwd,
+                    a.get_sql,
+                    a.write_back_tag,
+                    a.write_back_sql,
+                    a.wb_param1_type,
+                    a.wb_param2_type,
+                    a.wb_param1_field,
+                    a.wb_param2_field,
+                    b.device_no,
+                    b.description description,
+                    (select ifnull(date_format(max(t.op_time), '%Y-%m-%d %H:%i:%s'), '-')
+                      from lab_data_upload_rec t
+                     where t.lab_cfg_id = a.lab_cfg_id ) latest_op_time
+              from lab_data_upload_cfg a, lab_device b
+             where a.is_valid = 'Y'
+                and a.ip=b.device_ip
+
+            <if test="labCfgId != null" >
+                and a.lab_cfg_id = to_number(#{labCfgId,jdbcType=VARCHAR})
+            </if>
+            <if test="usage != null" >
+                and b.usage = #{usage,jdbcType=VARCHAR}
+            </if>
+             order by a.lab_cfg_id
+    </select>
+
+    <!--同步数据到znrl数据库-->
+    <select id="syncData2TargetDB" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.LabDataUploadEntity">
+      {call PK_SYNC_2_ZNRL.sync_lab_main(#{syncData,mode=IN,jdbcType=VARCHAR},
+                                         #{taskId,mode=IN,jdbcType=VARCHAR},
+                                         #{opCode,mode=IN,jdbcType=VARCHAR},
+                                         #{resCode,mode=OUT,jdbcType=VARCHAR},
+                                         #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <!--天平查询-->
+    <resultMap id="ScalesResDataResultMap" type="org.jeecg.modules.business.vo.ScalesEntity">
+        <result column="scales_res_id" jdbcType="VARCHAR" property="id" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="device_no" jdbcType="VARCHAR" property="deviceNo" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="gg_no" jdbcType="VARCHAR" property="ggNo" />
+        <result column="temperature" jdbcType="VARCHAR" property="temperature" />
+        <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+        <result column="standard" jdbcType="VARCHAR" property="standard" />
+        <result column="myp_qty" jdbcType="VARCHAR" property="mypQty" />
+        <result column="sampling_qty" jdbcType="VARCHAR" property="samplingQty" />
+        <result column="total_qty" jdbcType="VARCHAR" property="totalQty" />
+        <result column="afterdry_qty" jdbcType="VARCHAR" property="afterDryQty" />
+        <result column="test_qty" jdbcType="VARCHAR" property="testQty" />
+        <result column="qty_loss" jdbcType="VARCHAR" property="qtyLoss" />
+        <result column="loss_style" jdbcType="VARCHAR" property="lossStyle" />
+        <result column="index_type" jdbcType="VARCHAR" property="indexType" />
+        <result column="index_type_name" jdbcType="VARCHAR" property="indexTypeName" />
+        <result column="index_value" jdbcType="VARCHAR" property="indexVal" />
+        <result column="org_keyid" jdbcType="VARCHAR" property="orgKeyId" />
+        <result column="mt" jdbcType="VARCHAR" property="mt" />
+        <result column="mad" jdbcType="VARCHAR" property="mad" />
+        <result column="ad_style" jdbcType="VARCHAR" property="adStyle" />
+        <result column="aad" jdbcType="VARCHAR" property="aad" />
+        <result column="ad" jdbcType="VARCHAR" property="ad" />
+        <result column="vad" jdbcType="VARCHAR" property="vad" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="op_date" jdbcType="VARCHAR" property="opDate" />
+        <result column="confirm_time" jdbcType="VARCHAR" property="confirmTime" />
+        <result column="confirm_name" jdbcType="VARCHAR" property="confirmName" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="other_status_name" jdbcType="VARCHAR" property="otherStatusName" />
+        <result column="batch_type" jdbcType="VARCHAR" property="batchType" />
+        <result column="cc_val" jdbcType="VARCHAR" property="ccVal" />
+        <result column="cc_status" jdbcType="VARCHAR" property="ccStatus" />
+        <result column="report_tag" jdbcType="VARCHAR" property="reportTag"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <!--天平化验原始数据查询-->
+    <select id="qryScalesResOrgData"  parameterType="org.jeecg.modules.business.vo.ScalesEntity" resultMap="ScalesResDataResultMap">
+        SELECT a.scales_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        '' temperature,
+        '' humidity,
+        '' standard,
+        a.myp_qty,
+        a.sampling_qty,
+        a.total_qty,
+        a.afterdry_qty,
+        a.test_qty,
+        a.qty_loss,
+        a.loss_style,
+        a.mt,
+        a.mad,
+
+        (
+        CASE a.ad_style
+        WHEN '1' THEN
+        '快灰法'
+        WHEN '2' THEN
+        '慢灰法'
+        END
+        ) AS ad_style,
+        a.aad,
+        a.ad,
+        a.vad,
+        a.op_code,
+        a.op_name,
+        a.cc_val,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未确认'
+        WHEN '1' THEN
+        '已确认'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS status_name,
+        a.cc_status,
+        a.status
+        FROM LAB_SCALES_RESULT_ORG a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+             ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+
+
+    <!--定硫仪查询-->
+    <resultMap id="SResDataResultMap" type="org.jeecg.modules.business.vo.SEntity">
+        <result column="s_res_id" jdbcType="VARCHAR" property="id" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="device_no" jdbcType="VARCHAR" property="deviceNo" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="gg_no" jdbcType="VARCHAR" property="ggNo" />
+        <result column="temperature" jdbcType="VARCHAR" property="temperature" />
+        <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+        <result column="standard" jdbcType="VARCHAR" property="standard" />
+        <result column="sampling_name" jdbcType="VARCHAR" property="samplingName" />
+        <result column="sampling_weight" jdbcType="VARCHAR" property="samplingWeight" />
+        <result column="mad" jdbcType="VARCHAR" property="mad" />
+        <result column="st_ad" jdbcType="VARCHAR" property="stAd" />
+        <result column="st_d" jdbcType="VARCHAR" property="stD" />
+        <result column="cc_val" jdbcType="VARCHAR" property="ccVal" />
+        <result column="jz_style" jdbcType="VARCHAR" property="jzStyle" />
+        <result column="total_time" jdbcType="VARCHAR" property="totalTime" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="op_date" jdbcType="VARCHAR" property="opDate" />
+        <result column="cc_status" jdbcType="VARCHAR" property="ccStatus" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="other_status_name" jdbcType="VARCHAR" property="otherStatusName" />
+        <result column="batch_type" jdbcType="VARCHAR" property="batchType" />
+        <result column="report_tag" jdbcType="VARCHAR" property="reportTag"/>
+    </resultMap>
+
+    <!--定硫仪化验原始数据查询-->
+    <select id="qrySResOrgData"  parameterType="org.jeecg.modules.business.vo.SEntity" resultMap="SResDataResultMap">
+        SELECT a.s_res_id,
+        a.labor_code,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        a.sampling_name,
+        '' temperature,
+        '' humidity,
+        '' standard,
+        a.sampling_weight,
+        a.mad,
+        a.st_ad,
+        a.st_d,
+        a.cc_val,
+        a.jz_style,
+        a.total_time,
+        a.insert_time,
+        a.op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未确认'
+        WHEN '1' THEN
+        '已确认'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS status_name,
+        a.cc_status,
+        a.status
+        FROM LAB_S_RESULT_ORG a
+        WHERE 1 = 1
+        <if test="beginDate != null" >
+        <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+         <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--工业分析仪查询结果集映射-->
+    <resultMap id="IAResDataResultMap" type="org.jeecg.modules.business.vo.IndstAnalyEntity">
+        <result column="indst_analy_res_id" jdbcType="VARCHAR" property="id" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="device_no" jdbcType="VARCHAR" property="deviceNo" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="gg_no" jdbcType="VARCHAR" property="ggNo" />
+        <result column="temperature" jdbcType="VARCHAR" property="temperature" />
+        <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+        <result column="standard" jdbcType="VARCHAR" property="standard" />
+        <result column="loss_style" jdbcType="VARCHAR" property="lossStyle" />
+        <result column="sampling_name" jdbcType="VARCHAR" property="samplingName" />
+        <result column="sh_kgg_weight" jdbcType="VARCHAR" property="shKggWeight" />
+        <result column="sh_sampling_weight" jdbcType="VARCHAR" property="shSamplingWeight" />
+        <result column="mad" jdbcType="VARCHAR" property="mad" />
+        <result column="aad" jdbcType="VARCHAR" property="aad" />
+        <result column="ad" jdbcType="VARCHAR" property="ad" />
+        <result column="hk_total_weight" jdbcType="VARCHAR" property="hkTotalWeight" />
+        <result column="hk_sampling_weight" jdbcType="VARCHAR" property="hkSamplingWeight" />
+        <result column="vad" jdbcType="VARCHAR" property="vad" />
+        <result column="vdaf" jdbcType="VARCHAR" property="vdaf" />
+        <result column="cc_val" jdbcType="VARCHAR" property="ccVal" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="op_date" jdbcType="VARCHAR" property="opDate" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="cc_status" jdbcType="VARCHAR" property="ccStatus" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="other_status_name" jdbcType="VARCHAR" property="otherStatusName" />
+        <result column="batch_type" jdbcType="VARCHAR" property="batchType" />
+        <result column="report_tag" jdbcType="VARCHAR" property="reportTag"/>
+    </resultMap>
+
+    <!--工业分析仪原始数据查询-->
+    <select id="qryIAResOrgData"  parameterType="org.jeecg.modules.business.vo.IndstAnalyEntity" resultMap="IAResDataResultMap">
+        SELECT a.indst_analy_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        '' temperature,
+        '' humidity,
+        '' standard,
+        sampling_name,
+        sh_kgg_weight,
+        sh_sampling_weight,
+        mad,
+        aad,
+        ad,
+        hk_total_weight,
+        hk_sampling_weight,
+        vad,
+        vdaf,
+        cc_val,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未确认'
+        WHEN '1' THEN
+        '已确认'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS status_name,
+        a.cc_status,
+        a.status
+        FROM LAB_INDST_ANALY_RESULT_ORG a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <=  str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+
+        <if test='dataType == "mad"' >
+            and a.mad is not null
+        </if>
+
+        <if test='dataType == "aad"' >
+            and a.aad is not null
+        </if>
+
+        <if test='dataType == "vad"' >
+            and a.vad is not null
+        </if>
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--量热仪查询结果集映射-->
+    <resultMap id="HotResDataResultMap" type="org.jeecg.modules.business.vo.HotEntity">
+        <result column="hot_res_id" jdbcType="VARCHAR" property="id" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="device_no" jdbcType="VARCHAR" property="deviceNo" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="gg_no" jdbcType="VARCHAR" property="ggNo" />
+        <result column="temperature" jdbcType="VARCHAR" property="temperature" />
+        <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+        <result column="standard" jdbcType="VARCHAR" property="standard" />
+        <result column="sampling_name" jdbcType="VARCHAR" property="samplingName" />
+        <result column="sampling_weight" jdbcType="VARCHAR" property="samplingWeight" />
+        <result column="temp_increase" jdbcType="VARCHAR" property="tempIncrease" />
+        <result column="jz_value" jdbcType="VARCHAR" property="jzValue" />
+        <result column="jq_temp" jdbcType="VARCHAR" property="jqTemp" />
+        <result column="qb_ad" jdbcType="VARCHAR" property="qbAd" />
+        <result column="cc_val" jdbcType="VARCHAR" property="ccVal" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="other_status_name" jdbcType="VARCHAR" property="otherStatusName" />
+        <result column="cc_status" jdbcType="VARCHAR" property="ccStatus" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="op_date" jdbcType="VARCHAR" property="opDate" />
+        <result column="batch_type" jdbcType="VARCHAR" property="batchType" />
+        <result column="report_tag" jdbcType="VARCHAR" property="reportTag"/>
+    </resultMap>
+
+
+    <!--量热仪原始数据查询-->
+    <select id="qryHotResOrgData"  parameterType="org.jeecg.modules.business.vo.HotEntity" resultMap="HotResDataResultMap">
+        SELECT a.hot_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        '' temperature,
+        '' humidity,
+        '' standard,
+        sampling_name,
+        sampling_weight,
+        temp_increase,
+        jz_value,
+        jq_temp,
+        qb_ad,
+        cc_val,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未确认'
+        WHEN '1' THEN
+        '已确认'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS status_name,
+        a.cc_status,
+        a.status
+        FROM LAB_HOT_RESULT_ORG a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--光波分析仪查询结果集映射-->
+    <resultMap id="LAResDataResultMap" type="org.jeecg.modules.business.vo.LightAnalyEntity">
+        <result column="light_analy_res_id" jdbcType="VARCHAR" property="id" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="device_no" jdbcType="VARCHAR" property="deviceNo" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="gg_no" jdbcType="VARCHAR" property="ggNo" />
+        <result column="temperature" jdbcType="VARCHAR" property="temperature" />
+        <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+        <result column="standard" jdbcType="VARCHAR" property="standard" />
+        <result column="sampling_name" jdbcType="VARCHAR" property="samplingName" />
+        <result column="sampling_weight" jdbcType="VARCHAR" property="samplingWeight" />
+        <result column="myp_weight" jdbcType="VARCHAR" property="mypWeight" />
+        <result column="weight_loss" jdbcType="VARCHAR" property="weightLoss" />
+        <result column="mt" jdbcType="VARCHAR" property="mt" />
+        <result column="temp_power" jdbcType="VARCHAR" property="tempPower" />
+        <result column="keep_time" jdbcType="VARCHAR" property="keepTime" />
+        <result column="cc_val" jdbcType="VARCHAR" property="ccVal" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="other_status_name" jdbcType="VARCHAR" property="otherStatusName" />
+        <result column="cc_status" jdbcType="VARCHAR" property="ccStatus" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="op_date" jdbcType="VARCHAR" property="opDate" />
+        <result column="batch_type" jdbcType="VARCHAR" property="batchType" />
+        <result column="report_tag" jdbcType="VARCHAR" property="reportTag"/>
+    </resultMap>
+
+    <!--光波分析仪原始数据查询-->
+    <select id="qryLaResOrgData"  parameterType="org.jeecg.modules.business.vo.LightAnalyEntity" resultMap="LAResDataResultMap">
+        SELECT a.light_analy_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        '' temperature,
+        '' humidity,
+        '' standard,
+        sampling_name,
+        sampling_weight,
+        myp_weight,
+        weight_loss,
+        mt,
+        temp_power,
+        keep_time,
+        cc_val,
+        cc_status,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未确认'
+        WHEN '1' THEN
+        '已确认'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS status_name,
+        a.status
+        FROM LAB_LIGHT_ANALY_RESULT_ORG a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+
+    <!--红外测氢仪查询结果集映射-->
+    <resultMap id="HwResDataResultMap" type="org.jeecg.modules.business.vo.HEntity">
+        <result column="h_res_id" jdbcType="VARCHAR" property="id" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="device_no" jdbcType="VARCHAR" property="deviceNo" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="gg_no" jdbcType="VARCHAR" property="ggNo" />
+        <result column="temperature" jdbcType="VARCHAR" property="temperature" />
+        <result column="humidity" jdbcType="VARCHAR" property="humidity" />
+        <result column="standard" jdbcType="VARCHAR" property="standard" />
+        <result column="sampling_name" jdbcType="VARCHAR" property="samplingName" />
+        <result column="sampling_weight" jdbcType="VARCHAR" property="samplingWeight" />
+        <result column="method" jdbcType="VARCHAR" property="method" />
+        <result column="mad" jdbcType="VARCHAR" property="mad" />
+        <result column="cad" jdbcType="VARCHAR" property="cad" />
+        <result column="cd" jdbcType="VARCHAR" property="cd" />
+        <result column="had" jdbcType="VARCHAR" property="had" />
+        <result column="hd" jdbcType="VARCHAR" property="hd" />
+        <result column="cc_val" jdbcType="VARCHAR" property="ccVal" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="other_status_name" jdbcType="VARCHAR" property="otherStatusName" />
+        <result column="cc_status" jdbcType="VARCHAR" property="ccStatus" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="op_date" jdbcType="VARCHAR" property="opDate" />
+        <result column="batch_type" jdbcType="VARCHAR" property="batchType" />
+        <result column="report_tag" jdbcType="VARCHAR" property="reportTag"/>
+    </resultMap>
+
+    <!--红外测氢仪原始数据查询-->
+    <select id="qryHwResOrgData"  parameterType="org.jeecg.modules.business.vo.HEntity" resultMap="HwResDataResultMap">
+        SELECT a.h_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        '' temperature,
+        '' humidity,
+        '' standard,
+        sampling_name,
+        sampling_weight,
+        method,
+        mad,
+        cad,
+        cd,
+        had,
+        hd,
+        cc_val,
+        cc_status,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未确认'
+        WHEN '1' THEN
+        '已确认'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS status_name,
+        a.status
+        FROM LAB_H_RESULT_ORG a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--确认原始数据失效，并填写温度、湿度、执行标准-->
+    <select id="deleteLabData" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.SEntity">
+      {call PK_LABORY.delete_lab_data(#{updateString,mode=IN,jdbcType=VARCHAR},
+                                    #{updateCode,mode=IN,jdbcType=VARCHAR},
+                                    #{dataType,mode=IN,jdbcType=VARCHAR},
+                                    #{resCode,mode=OUT,jdbcType=VARCHAR},
+                                    #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <!--确认提交有效的化验原始数据-->
+    <select id="scalesLotAddSubmit" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.ScalesEntity">
+      {call pk_labory.scales_lot_addSubmit(#{updateString,mode=IN,jdbcType=VARCHAR},
+                                           #{publicString,mode=IN,jdbcType=VARCHAR},
+                                           #{confirmCd,mode=IN,jdbcType=VARCHAR},
+                                           #{dataType,mode=IN,jdbcType=VARCHAR},
+                                           #{resCode,mode=OUT,jdbcType=VARCHAR},
+                                           #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <!--天平化验数据查询-->
+    <select id="qryScalesResData"  parameterType="org.jeecg.modules.business.vo.ScalesEntity" resultMap="ScalesResDataResultMap">
+        SELECT a.scales_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        a.temperature,
+        a.humidity,
+        (select c.standard_name from lab_standard c where c.standard_id = a.standard) standard,
+        a.myp_qty,
+        a.sampling_qty,
+        a.total_qty,
+        a.afterdry_qty,
+        a.test_qty,
+        a.qty_loss,
+        a.loss_style,
+        a.mt,
+        a.mad,
+        (
+        CASE a.ad_style
+        WHEN '1' THEN
+        '快灰法'
+        WHEN '2' THEN
+        '慢灰法'
+        END
+        ) AS ad_style,
+        a.aad,
+        a.ad,
+        a.vad,
+        a.op_code,
+        a.op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未审批'
+        WHEN '1' THEN
+        '审批中'
+        WHEN '2' THEN
+        '已审批'
+        WHEN '3' THEN
+        '作废'
+        END
+        ) AS status_name,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未计算'
+        WHEN '1' THEN
+        '已计算'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS other_status_name,
+        (select sign(count(1)) from lab_report b where b.labor_code = a.labor_code and b.appr_status <![CDATA[ <> ]]> '3') report_tag,
+        a.status
+        FROM LAB_SCALES_RESULT a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+             ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+
+        order by a.op_time desc,a.labor_code desc,mt desc ,mad desc,aad desc,vad desc
+
+    </select>
+
+    <!--定硫仪化验数据查询-->
+    <select id="qrySResData"  parameterType="org.jeecg.modules.business.vo.SEntity" resultMap="SResDataResultMap">
+        SELECT s_res_id,
+        labor_code,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        gg_no,
+        sampling_name,
+        temperature,
+        humidity,
+        (select c.standard_name from lab_standard c where c.standard_id = a.standard) standard,
+        sampling_weight,
+        mad,
+        st_ad,
+        st_d,
+        cc_val,
+        jz_style,
+        total_time,
+        insert_time,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未审批'
+        WHEN '1' THEN
+        '审批中'
+        WHEN '2' THEN
+        '已审批'
+        WHEN '3' THEN
+        '作废'
+        END
+        ) AS status_name,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未计算'
+        WHEN '1' THEN
+        '已计算'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS other_status_name,
+        (select sign(count(1)) from lab_report b where b.labor_code = a.labor_code  and b.appr_status <![CDATA[ <> ]]> '3') report_tag,
+        a.status
+        FROM LAB_S_RESULT a
+        WHERE 1 = 1
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--工业分析仪数据查询-->
+    <select id="qryIAResData"  parameterType="org.jeecg.modules.business.vo.IndstAnalyEntity" resultMap="IAResDataResultMap">
+        SELECT a.indst_analy_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        temperature,
+        loss_style,
+        humidity,
+        (select c.standard_name from lab_standard c where c.standard_id = a.standard) standard,
+        sampling_name,
+        sh_kgg_weight,
+        sh_sampling_weight,
+        mad,
+        aad,
+        ad,
+        hk_total_weight,
+        hk_sampling_weight,
+        vad,
+        vdaf,
+        cc_val,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未审批'
+        WHEN '1' THEN
+        '审批中'
+        WHEN '2' THEN
+        '已审批'
+        WHEN '3' THEN
+        '作废'
+        END
+        ) AS status_name,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未计算'
+        WHEN '1' THEN
+        '已计算'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS other_status_name,
+        (select sign(count(1)) from lab_report b where b.labor_code = a.labor_code  and b.appr_status <![CDATA[ <> ]]> '3') report_tag,
+        a.status
+        FROM LAB_INDST_ANALY_RESULT a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--量热仪数据查询-->
+    <select id="qryHotResData"  parameterType="org.jeecg.modules.business.vo.HotEntity" resultMap="HotResDataResultMap">
+        SELECT a.hot_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        temperature,
+        humidity,
+        (select c.standard_name from lab_standard c where c.standard_id = a.standard) standard,
+        sampling_name,
+        sampling_weight,
+        temp_increase,
+        jz_value,
+        jq_temp,
+        qb_ad,
+        cc_val,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未审批'
+        WHEN '1' THEN
+        '审批中'
+        WHEN '2' THEN
+        '已审批'
+        WHEN '3' THEN
+        '作废'
+        END
+        ) AS status_name,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未计算'
+        WHEN '1' THEN
+        '已计算'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS other_status_name,
+        (select sign(count(1)) from lab_report b where b.labor_code = a.labor_code  and b.appr_status <![CDATA[ <> ]]> '3') report_tag,
+        a.status
+        FROM LAB_HOT_RESULT a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--光波分析仪数据查询-->
+    <select id="qryLaResData"  parameterType="org.jeecg.modules.business.vo.LightAnalyEntity" resultMap="LAResDataResultMap">
+        SELECT a.light_analy_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        temperature,
+        humidity,
+        (select c.standard_name from lab_standard c where c.standard_id = a.standard) standard,
+        sampling_name,
+        sampling_weight,
+        myp_weight,
+        weight_loss,
+        mt,
+        temp_power,
+        keep_time,
+        cc_val,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未审批'
+        WHEN '1' THEN
+        '审批中'
+        WHEN '2' THEN
+        '已审批'
+        WHEN '3' THEN
+        '作废'
+        END
+        ) AS status_name,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未计算'
+        WHEN '1' THEN
+        '已计算'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS other_status_name,
+        (select sign(count(1)) from lab_report b where b.labor_code = a.labor_code  and b.appr_status <![CDATA[ <> ]]> '3') report_tag,
+        a.status
+        FROM LAB_LIGHT_ANALY_RESULT a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--红外测氢仪数据查询-->
+    <select id="qryHwResData"  parameterType="org.jeecg.modules.business.vo.HEntity" resultMap="HwResDataResultMap">
+        SELECT a.h_res_id,
+        a.labor_code,
+        a.device_no,
+        (select b.device_name from LAB_DEVICE b where b.device_no = a.device_no) device_name,
+        a.gg_no,
+        temperature,
+        humidity,
+        (select c.standard_name from lab_standard c where c.standard_id = a.standard) standard,
+        sampling_name,
+        sampling_weight,
+        method,
+        mad,
+        cad,
+        cd,
+        had,
+        hd,
+        cc_val,
+        op_code,
+        op_name,
+        (
+        CASE a.batch_type
+        WHEN '1' THEN
+        '初次化验'
+        WHEN '2' THEN
+        '抽样第1次'
+        WHEN '3' THEN
+        '抽样第2次'
+        WHEN '4' THEN
+        '抽样第3次'
+        END
+        ) AS batch_type,
+        date_format(a.op_time,'%Y-%m-%d %H:%i:%s') AS op_time,
+        date_format(a.op_time, '%Y-%m-%d') AS op_date,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未审批'
+        WHEN '1' THEN
+        '审批中'
+        WHEN '2' THEN
+        '已审批'
+        WHEN '3' THEN
+        '作废'
+        END
+        ) AS status_name,
+        (
+        CASE a. STATUS
+        WHEN '0' THEN
+        '未计算'
+        WHEN '1' THEN
+        '已计算'
+        WHEN '2' THEN
+        '作废'
+        END
+        ) AS other_status_name,
+        (select sign(count(1)) from lab_report b where b.labor_code = a.labor_code  and b.appr_status <![CDATA[ <> ]]> '3') report_tag,
+        a.status
+        FROM LAB_H_RESULT a
+        WHERE 1 = 1
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and a.op_time  >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and a.op_time  <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="laborCode != null" >
+            and a.labor_code = #{laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and a.status = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchType != null" >
+            and a.batch_type = #{batchType,jdbcType=VARCHAR}
+        </if>
+        order by a.op_time desc,a.labor_code desc
+    </select>
+
+    <!--生成化验报告,提交审批-->
+    <select id="submit4LabReport" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.SEntity">
+      {call PK_LABORY.appr_4_lab_report(#{laborCode,mode=IN,jdbcType=VARCHAR},
+                                        #{apprEventTypeCd,mode=IN,jdbcType=VARCHAR},
+                                        #{batchType,mode=IN,jdbcType=VARCHAR},
+                                        #{opCode,mode=IN,jdbcType=VARCHAR},
+                                        #{resCode,mode=OUT,jdbcType=VARCHAR},
+                                        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <!--化验报告集映射-->
+    <resultMap id="ReportDataResultMap" type="org.jeecg.modules.business.vo.ReportEntity">
+        <result column="lab_report_id" jdbcType="VARCHAR" property="labReportId" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="batch_no_type" jdbcType="VARCHAR" property="batchNoType" />
+        <result column="mt" jdbcType="VARCHAR" property="mt" />
+        <result column="mad" jdbcType="VARCHAR" property="mad" />
+        <result column="aad" jdbcType="VARCHAR" property="aad" />
+        <result column="ad" jdbcType="VARCHAR" property="ad" />
+        <result column="aar" jdbcType="VARCHAR" property="aar" />
+        <result column="vad" jdbcType="VARCHAR" property="vad" />
+        <result column="vd" jdbcType="VARCHAR" property="vd" />
+        <result column="var" jdbcType="VARCHAR" property="var" />
+        <result column="vdaf" jdbcType="VARCHAR" property="vdaf" />
+        <result column="st_ad" jdbcType="VARCHAR" property="stad" />
+        <result column="st_d" jdbcType="VARCHAR" property="std" />
+        <result column="st_ar" jdbcType="VARCHAR" property="star" />
+        <result column="hd" jdbcType="VARCHAR" property="hd" />
+        <result column="had" jdbcType="VARCHAR" property="had" />
+        <result column="har" jdbcType="VARCHAR" property="har" />
+        <result column="hdaf" jdbcType="VARCHAR" property="hdaf" />
+        <result column="cad" jdbcType="VARCHAR" property="cad" />
+        <result column="fcad" jdbcType="VARCHAR" property="fcad" />
+        <result column="fcar" jdbcType="VARCHAR" property="fcar" />
+        <result column="fcd" jdbcType="VARCHAR" property="fcd" />
+        <result column="fcdaf" jdbcType="VARCHAR" property="fcdaf" />
+        <result column="nad" jdbcType="VARCHAR" property="nad" />
+        <result column="qb_ad" jdbcType="VARCHAR" property="qbad" />
+        <result column="qb_ar" jdbcType="VARCHAR" property="qbar" />
+        <result column="qb_d" jdbcType="VARCHAR" property="qbd" />
+        <result column="qb_daf" jdbcType="VARCHAR" property="qbdaf" />
+        <result column="qgr_ad" jdbcType="VARCHAR" property="qgrad" />
+        <result column="qgr_ar" jdbcType="VARCHAR" property="qgrar" />
+        <result column="qgr_d" jdbcType="VARCHAR" property="qgrd" />
+        <result column="qgr_daf" jdbcType="VARCHAR" property="qgrdaf" />
+        <result column="qnet_ad" jdbcType="VARCHAR" property="qnetad" />
+        <result column="qnet_arj" jdbcType="VARCHAR" property="qnetarj" />
+        <result column="qnet_arm" jdbcType="VARCHAR" property="qnetarm" />
+        <result column="qnet_d" jdbcType="VARCHAR" property="qnetd" />
+        <result column="st" jdbcType="VARCHAR" property="st" />
+        <result column="dt" jdbcType="VARCHAR" property="dt" />
+        <result column="ht" jdbcType="VARCHAR" property="ht" />
+        <result column="ft" jdbcType="VARCHAR" property="ft" />
+        <result column="crc" jdbcType="VARCHAR" property="crc" />
+        <result column="batch_type" jdbcType="VARCHAR" property="batchType" />
+        <result column="appr_status" jdbcType="VARCHAR" property="apprStatus" />
+        <result column="appr_status_code" jdbcType="VARCHAR" property="apprStatusCode" />
+        <result column="hy_date" jdbcType="VARCHAR" property="hyDate" />
+        <result column="sample_date" jdbcType="VARCHAR" property="sampleDate" />
+        <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+        <result column="update_code" jdbcType="VARCHAR" property="updateCode" />
+        <result column="jh_time" jdbcType="VARCHAR" property="jhTime" />
+        <result column="jh_code" jdbcType="VARCHAR" property="jhCode" />
+        <result column="insert_time" jdbcType="VARCHAR" property="insertTime" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_desc" jdbcType="VARCHAR" property="opDesc" />
+        <result column="ven_name" jdbcType="VARCHAR" property="venName" />
+        <result column="coal_name" jdbcType="VARCHAR" property="coalName" />
+        <result column="standing_book_id" jdbcType="VARCHAR" property="standingBookId" />
+        <result column="ship_name" jdbcType="VARCHAR" property="shipName" />
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="trans_no" jdbcType="VARCHAR" property="transNo" />
+        <result column="proportion_type" jdbcType="VARCHAR" property="proportionType" />
+        <result column="proportion" jdbcType="VARCHAR" property="proportion" />
+        <result column="proportion_tag" jdbcType="VARCHAR" property="proportionTag" />
+        <result column="proportion_type_name" jdbcType="VARCHAR" property="proportionTypeName" />
+        <result column="proportion_tag_name" jdbcType="VARCHAR" property="proportionTagName" />
+        <result column="car_cnt" jdbcType="VARCHAR" property="carCnt" />
+        <result column="batch_time" jdbcType="VARCHAR" property="batchTime" />
+        <result column="receive_time" jdbcType="VARCHAR" property="receiveTime" />
+        <result column="receive_op" jdbcType="VARCHAR" property="receiveOp" />
+    </resultMap>
+
+    <!--化验报告数据查询-->
+    <select id="qryReportData"  parameterType="org.jeecg.modules.business.vo.ReportEntity" resultMap="ReportDataResultMap">
+        SELECT a.lab_report_id,
+        a.labor_code,
+        b.batch_no,
+        b.batch_no_type,
+        a.mt,
+        a.mad,
+        a.aad,
+        a.ad,
+        a.aar,
+        a.vad,
+        a.vd,
+        a.var,
+        a.vdaf,
+        a.st_ad,
+        a.st_d,
+        a.st_ar,
+        a.hd,
+        a.had,
+        a.fcad,
+        a.cad,
+        a.nad,
+        a.qb_ad,
+        a.qb_ar,
+        a.qb_d,
+        a.qb_daf,
+        a.qgr_ad,
+        a.qgr_ar,
+        a.qgr_d,
+        a.qgr_daf,
+        a.qnet_ad,
+        a.qnet_arj,
+        a.qnet_arm,
+        a.qnet_d,
+        a.batch_type,
+        (
+        CASE a.appr_status
+        WHEN '0' THEN
+        '未审批'
+        WHEN '1' THEN
+        '审批中'
+        WHEN '2' THEN
+        '审批通过'
+        WHEN '3' THEN
+        '审批未通过'
+        END
+        ) AS appr_status,
+
+        a.appr_status appr_status_code,
+
+        date_format(a.update_time,'%Y-%m-%d %H:%i:%s') AS update_time,
+        a.update_code,
+        date_format(a.jh_time, '%Y-%m-%d %H:%i:%s') jh_time,
+        a.jh_code,
+        date_format(a.insert_time, '%Y-%m-%d') insert_time,
+        date_format(a.hy_date, '%Y-%m-%d') hy_date,
+        a.op_code,
+        a.op_desc,
+        (select c.mine_name from coal_mine c where c.mine_no = b.mine_no) ven_name,
+        (select d.coal_name from coal_type d where d.coal_no = b.coal_no) coal_name
+        FROM LAB_REPORT a,BATCH_NO_INFO b
+        WHERE 1 = 1
+        and a.labor_code = b.labor_code
+
+        <if test="reportEntity.batchType != null" >
+            and b.batch_no_type = #{reportEntity.batchType,jdbcType=VARCHAR}
+        </if>
+
+        <if test="reportEntity.apprStatus != null" >
+            and  a.appr_status = #{reportEntity.apprStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="reportEntity.laborCode != null" >
+            and a.labor_code  = #{reportEntity.laborCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="reportEntity.beginDate != null" >
+            <![CDATA[
+            and a.hy_date  >= str_to_date(#{reportEntity.beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="reportEntity.endDate != null" >
+            <![CDATA[
+            and a.hy_date  <= str_to_date(#{reportEntity.endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1-0.00001
+            ]]>
+        </if>
+
+        <if test="reportEntity.venName != null" >
+            and b.mine_no  = #{reportEntity.venName,jdbcType=VARCHAR}
+        </if>
+        <if test="reportEntity.term != null" >
+            and (select goods_receiver from rlrecordmsthy where train_batch_no = b.batch_no and rownum  <![CDATA[ < ]]> 2) = #{reportEntity.term,jdbcType=VARCHAR}
+        </if>
+
+        order by a.lab_report_id desc
+    </select>
+
+    <!--对已经生产的化验报告进行，审批-->
+    <select id="submitLabResults" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.SEntity">
+        {call PK_LABORY.appr_lab_results(#{jsonStr,mode=IN,jdbcType=VARCHAR},
+                                        #{apprEventTypeCd,mode=IN,jdbcType=VARCHAR},
+                                        #{opCode,mode=IN,jdbcType=VARCHAR},
+                                        #{resCode,mode=OUT,jdbcType=VARCHAR},
+                                        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+
+
+
+    <resultMap id="ManSampleInfoResultMap" type="org.jeecg.modules.business.vo.ManualSampleEntity">
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="train_no" jdbcType="VARCHAR" property="trainNo" />
+        <result column="sample_code" jdbcType="VARCHAR" property="sampleCode" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="sampling_code" jdbcType="VARCHAR" property="samplingCode" />
+        <result column="man_sample_code" jdbcType="VARCHAR" property="manSampleCode" />
+        <result column="car_nos" jdbcType="VARCHAR" property="carIds" />
+        <result column="car_order_nos" jdbcType="VARCHAR" property="xhNums" />
+        <result column="batch_no_type" jdbcType="VARCHAR" property="batchNoType" />
+        <result column="car_Cnt" jdbcType="VARCHAR" property="carCnt" />
+        <result column="print_Num" jdbcType="VARCHAR" property="printNum" />
+        <result column="print_num_pack" jdbcType="VARCHAR" property="printNumPack" />
+        <result column="print_num_sample" jdbcType="VARCHAR" property="printNumSample" />
+        <result column="print_num_sampling" jdbcType="VARCHAR" property="printNumSampling" />
+        <result column="print_num_labor" jdbcType="VARCHAR" property="printNumLabor" />
+        <result column="pack_code" jdbcType="VARCHAR" property="packCode" />
+        <result column="print_opname_sample" jdbcType="VARCHAR" property="printOpNameSample" />
+        <result column="print_opname_sampling" jdbcType="VARCHAR" property="printOpNameSampling" />
+        <result column="print_opname_labor" jdbcType="VARCHAR" property="printOpNameLabor" />
+        <result column="print_opname_pack" jdbcType="VARCHAR" property="printOpNamePack" />
+        <result column="print_optime_sample" jdbcType="VARCHAR" property="printOpTimeSample" />
+        <result column="print_optime_sampling" jdbcType="VARCHAR" property="printOpTimeSampling" />
+        <result column="print_optime_labor" jdbcType="VARCHAR" property="printOpTimeLabor" />
+        <result column="print_optime_pack" jdbcType="VARCHAR" property="printOpTimePack" />
+
+    </resultMap>
+
+
+
+    <!--(select getBatchCarIds(t.batch_no,t.batch_no_type) from dual) as  car_nos,
+        getBatchInfo(t.batch_no, '2',t.batch_no_type) car_order_nos,-->
+    <select id="qryManInfo" parameterType="org.jeecg.modules.business.vo.ManualSampleEntity" resultMap="ManSampleInfoResultMap" >
+        select t.batch_no,
+        t.train_no,
+        t.sample_code,
+        t.labor_code,
+        t.man_sample_code,
+        t.sampling_code,
+        t.batch_no_type,
+
+        t.insert_time
+        from batch_no_info t
+        where 1 = 1
+
+        <if test="batchNo != null" >
+            and t.batch_no  = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNoType != null" >
+            and t.batch_no_type  = #{batchNoType,jdbcType=VARCHAR}
+        </if>
+
+        <if test="beginDate != null" >
+            <![CDATA[
+            and t.insert_time >= str_to_date(#{beginDate,jdbcType=VARCHAR}, '%Y-%m-%d')
+            ]]>
+        </if>
+
+        <if test="endDate != null" >
+            <![CDATA[
+            and t.insert_time <= str_to_date(#{endDate,jdbcType=VARCHAR}, '%Y-%m-%d')+1
+             ]]>
+        </if>
+
+        <if test="sampleCode != null" >
+            and t.sample_code = #{sampleCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="samplingCode != null" >
+            and t.sampling_code = #{samplingCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="packCode != null" >
+            and t.sampling_code = get_sampling_code_by_packcd(#{packCode,jdbcType=VARCHAR})
+        </if>
+        order by t.insert_time desc
+    </select>
+
+
+</mapper>

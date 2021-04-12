@@ -1,0 +1,1207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.RptMapper">
+
+
+    <!--查询称重汇总报表数据，暂时固定查当天的-->
+    <resultMap id="weightSummaryRptResultMap" type="org.jeecg.modules.business.vo.WeightRptEntity">
+        <result column="total_entry_cnt" jdbcType="VARCHAR" property="totalEntryCnt" />
+        <result column="total_cz_cnt" jdbcType="VARCHAR" property="totalCZCnt" />
+        <result column="total_jq_cnt" jdbcType="VARCHAR" property="totalJQCnt" />
+        <result column="total_sample_cnt" jdbcType="VARCHAR" property="totalSampleCnt" />
+        <result column="total_deny_cnt" jdbcType="VARCHAR" property="totalDenyCnt" />
+        <result column="total_checkin_cnt" jdbcType="VARCHAR" property="totalCheckInCnt" />
+        <result column="total_checintun_cnt" jdbcType="VARCHAR" property="totalCheckInTunCnt" />
+    </resultMap>
+
+    <select id="qryEntryTotalCnt" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.Integer">
+        select count(1)
+        from RLRECORDMSTQY a
+        where 1 = 1
+
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryWeightTotalCnt" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.Integer" >
+        select count(1)
+        from RLRECORDMSTQY a
+        where  a.cz_dtm is not null
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryLightTotalCnt" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.Integer" >
+        select count(1)
+        from RLRECORDMSTQY a
+        where a.jq_dtm is not null
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalMz" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.mz_qty), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalPz" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.pz_qty), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalNet" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.net_qty), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalTick" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.tick_qty), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalKd" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.kd_qty), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalKd4ZJ" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(ifnull(a.kd_qty, 0)+ifnull(a.kg_qty, 0)), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalHpQty" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.net_qty), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        and a.jq_dtm is not NULL
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.jq_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.jq_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalDiffQty" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(sum(ifnull(a.tick_qty,0) - (ifnull(a.mz_qty,0)-ifnull(a.pz_qty,0)))/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s hh24:mi:ss')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s hh24:mi:ss')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="qryTotalNoKdNetQty" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.mz_qty-a.pz_qty), 0)/1000,2)
+        from RLRECORDMSTQY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s hh24:mi:ss')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s hh24:mi:ss')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="leaveBeginTime != null" >
+            <![CDATA[
+             and a.leave_dtm >= STR_TO_DATE(#{leaveBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="leaveEndTime != null" >
+            <![CDATA[
+             and a.leave_dtm <= STR_TO_DATE(#{leaveEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id like #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.car_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="kdStatus != null" >
+            and getCarKdSta(a.record_no) = #{kdStatus,jdbcType=VARCHAR}
+        </if>
+
+        <if test="mineCardType != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.mine_card_type = #{mineCardType,jdbcType=VARCHAR})
+        </if>
+
+        <if test="shipNo != null" >
+            and exists (select a.mine_card_id from mine_card_info cd where lower(a.mine_card_id)=lower(cd.mine_card_id) and cd.ship_id = #{shipNo,jdbcType=VARCHAR})
+        </if>
+    </select>
+
+
+
+
+<!--    //////////////////////////////////////火车///////////////////////////////////////// -->
+    <select id="qryTrainEntryTotalCnt" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.Integer">
+        select count(1)
+        from RLRECORDMSTHY a
+        where 1 = 1
+
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id = #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="startPlace != null" >
+            and a.start_place = #{startPlace,jdbcType=VARCHAR}
+        </if>
+
+        <if test="czBeginTime != null" >
+            <![CDATA[
+            and a.cz_dtm >= STR_TO_DATE(#{czBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+
+        <if test="czEndTime != null" >
+            <![CDATA[
+            and a.cz_dtm <= STR_TO_DATE(#{czEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+            ]]>
+        </if>
+    </select>
+
+    <select id="qryTrainWeightTotalCnt" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.Integer" >
+        select count(1)
+        from RLRECORDMSTHY a
+        where 1 = 1
+        and a.mz_qty is not null
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id = #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="startPlace != null" >
+            and a.start_place = #{startPlace,jdbcType=VARCHAR}
+        </if>
+
+        <if test="czBeginTime != null" >
+            <![CDATA[
+            and a.cz_dtm >= STR_TO_DATE(#{czBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+
+        <if test="czEndTime != null" >
+            <![CDATA[
+            and a.cz_dtm <= STR_TO_DATE(#{czEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+            ]]>
+        </if>
+    </select>
+
+    <select id="qryTrainTotalMz" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.mz_qty), 0)/1000, 3)
+        from RLRECORDMSTHY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id = #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="startPlace != null" >
+            and a.start_place = #{startPlace,jdbcType=VARCHAR}
+        </if>
+
+        <if test="czBeginTime != null" >
+            <![CDATA[
+            and a.cz_dtm >= STR_TO_DATE(#{czBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+
+        <if test="czEndTime != null" >
+            <![CDATA[
+            and a.cz_dtm <= STR_TO_DATE(#{czEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+            ]]>
+        </if>
+    </select>
+
+    <select id="qryTrainTotalPz" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.pz_qty), 0)/1000, 3)
+        from RLRECORDMSTHY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id = #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="startPlace != null" >
+            and a.start_place = #{startPlace,jdbcType=VARCHAR}
+        </if>
+
+        <if test="czBeginTime != null" >
+            <![CDATA[
+            and a.cz_dtm >= STR_TO_DATE(#{czBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+
+        <if test="czEndTime != null" >
+            <![CDATA[
+            and a.cz_dtm <= STR_TO_DATE(#{czEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+            ]]>
+        </if>
+    </select>
+
+    <select id="qryTrainTotalNet" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select round(ifnull(sum(a.net_qty), 0)/1000, 3)
+        from RLRECORDMSTHY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id = #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="startPlace != null" >
+            and a.start_place = #{startPlace,jdbcType=VARCHAR}
+        </if>
+
+        <if test="czBeginTime != null" >
+            <![CDATA[
+            and a.cz_dtm >= STR_TO_DATE(#{czBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+
+        <if test="czEndTime != null" >
+            <![CDATA[
+            and a.cz_dtm <= STR_TO_DATE(#{czEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+            ]]>
+        </if>
+    </select>
+
+    <select id="qryTrainTotalTick" parameterType="org.jeecg.modules.business.vo.WeightRptEntity" resultType="java.lang.String" >
+        select ifnull(sum(a.tick_qty), 0)/1000
+        from RLRECORDMSTHY a
+        where 1 = 1
+        <if test="beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= STR_TO_DATE(#{beginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+             ]]>
+        </if>
+
+        <if test="endTime != null" >
+            <![CDATA[
+             and a.record_dtm <= STR_TO_DATE(#{endTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+             ]]>
+        </if>
+
+        <if test="venNo != null" >
+            and a.ven_no = #{venNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carrierNo != null" >
+            and a.carrier_no = #{carrierNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="carId != null" >
+            and a.car_id = #{carId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalNo != null" >
+            and a.coal_no = #{coalNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="batchNo != null" >
+            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="status != null" >
+            and getCarStatusInfo(a.record_no) = #{status,jdbcType=VARCHAR}
+        </if>
+
+        <if test="coalMine != null" >
+            and a.colry_no = #{coalMine,jdbcType=VARCHAR}
+        </if>
+
+        <if test="startPlace != null" >
+            and a.start_place = #{startPlace,jdbcType=VARCHAR}
+        </if>
+
+        <if test="czBeginTime != null" >
+            <![CDATA[
+            and a.cz_dtm >= STR_TO_DATE(#{czBeginTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')
+            ]]>
+        </if>
+
+        <if test="czEndTime != null" >
+            <![CDATA[
+            and a.cz_dtm <= STR_TO_DATE(#{czEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%s')+1-0.00001
+            ]]>
+        </if>
+    </select>
+<!--    //////////////////////////////////////火车///////////////////////////////////////// -->
+</mapper>

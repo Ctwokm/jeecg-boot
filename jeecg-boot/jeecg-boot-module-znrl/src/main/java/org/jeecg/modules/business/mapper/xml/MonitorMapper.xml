@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.MonitorMapper">
+<!-- 1.人工操作日志 2.设备错误 3.设备实时状态-->
+<!--   ######################################人工操作日志###################################################-->
+    <!--查询人工操作日志-->
+    <resultMap id="lopRecInfoResultMap" type="org.jeecg.modules.business.vo.LogOpRecEntity">
+        <result column="LOG_ID" jdbcType="VARCHAR" property="logId" />
+        <result column="LOG_OP_CODE" jdbcType="VARCHAR" property="logOpCode" />
+        <result column="LOG_OP_NAME" jdbcType="VARCHAR" property="logOpName" />
+        <result column="LOG_TYPE" jdbcType="VARCHAR" property="logType" />
+        <result column="LOG_TYPE_DEC" jdbcType="VARCHAR" property="logTypeDec" />
+        <result column="MOD_DESC" jdbcType="VARCHAR" property="modDec" />
+        <result column="LOG_DT" jdbcType="VARCHAR" property="logTime" />
+        <result column="host_ip" jdbcType="VARCHAR" property="hostIp" />
+        <result column="oper_menu" jdbcType="VARCHAR" property="operMenu" />
+        <result column="oper_button" jdbcType="VARCHAR" property="operButton" />
+        <result column="request_params" jdbcType="VARCHAR" property="requestParams" />
+    </resultMap>
+
+    <select id="qryLogModList" resultMap="lopRecInfoResultMap" parameterType="org.jeecg.modules.business.vo.LogOpRecEntity">
+        select  a.LOG_ID ,
+        a.LOG_OP_CODE,
+        ld.description LOG_TYPE_DEC,
+        su.realname LOG_OP_NAME,
+        a.MOD_DESC,
+        a.LOG_DT,
+        a.log_value1,
+        a.log_value2,
+        a.log_value3,
+        a.log_value4,
+        a.is_desc_gen_succ as succ
+        from log_mod_info a
+        left join log_type_desc ld on a.log_type = ld.log_type
+        left join sys_user su on convert(a.log_op_code,char) = convert(su.id,char)
+        where 1=1
+        <if test="logOpRecEntity.opStartTime != null" >
+            AND str_to_date(a.LOG_DT, '%Y-%m-%d') <![CDATA[ >= ]]> str_to_date(#{logOpRecEntity.opStartTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+        </if>
+        <if test="logOpRecEntity.opEndTime != null" >
+            AND str_to_date(a.LOG_DT, '%Y-%m-%d') <![CDATA[ <= ]]> str_to_date(#{logOpRecEntity.opEndTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+        </if>
+        <if test="logOpRecEntity.logOpCode != null" >
+            AND a.LOG_OP_CODE = #{logOpRecEntity.logOpCode,jdbcType=VARCHAR}
+        </if>
+        <if test="logOpRecEntity.logOpName != null" >
+            AND su.REALNAME = #{logOpRecEntity.logOpName,jdbcType=VARCHAR}
+        </if>
+        <if test="logOpRecEntity.logType != null" >
+            AND ld.log_type_id = #{logOpRecEntity.logType,jdbcType=VARCHAR}
+        </if>
+        <if test='logOpRecEntity.sysLogType == "0"' >
+            AND a.SYS_LOG_TYPE is null
+        </if>
+        <if test='logOpRecEntity.sysLogType == "1"' >
+            AND a.SYS_LOG_TYPE = '1'
+        </if>
+        order by A.LOG_DT desc
+    </select>
+<!--   #########################################人工操作日志################################################-->
+<!--   ######################################设备错误###################################################-->
+    <!--设备故障报警信息查询-->
+    <resultMap id="deviceErrViewResultMap" type="org.jeecg.modules.business.vo.DeviceErrEntity">
+        <id column="error_rec_id" jdbcType="INTEGER" property="errorRecId" />
+        <result column="error_time" jdbcType="VARCHAR" property="errorTime" />
+        <result column="error_dec" jdbcType="VARCHAR" property="errorDec" />
+        <result column="device_ip" jdbcType="VARCHAR" property="deviceIp" />
+        <result column="machin_code" jdbcType="VARCHAR" property="machineCode" />
+        <result column="machin_name" jdbcType="VARCHAR" property="machineName" />
+        <result column="confirm_op" jdbcType="VARCHAR" property="confirmOp" />
+        <result column="error_confirm" jdbcType="VARCHAR" property="errorConfirm" />
+        <result column="flow_id" jdbcType="VARCHAR" property="flowId" />
+        <result column="bak" jdbcType="VARCHAR" property="bak" />
+        <result column="flow_name" jdbcType="VARCHAR" property="flowName" />
+        <result column="error_pri" jdbcType="VARCHAR" property="errorPri" />
+    </resultMap>
+
+    <select id="qryDeviceErrList"  resultMap="deviceErrViewResultMap" parameterType="org.jeecg.modules.business.vo.DeviceErrEntity">
+        SELECT
+        a.ERROR_REC_ID,
+        a.ERROR_TIME,
+        a.ERROR_CODE,
+        a.ERROR_DEC,
+        a.DEVICE_IP,
+        a.MACHIN_CODE,
+        a.FLOW_ID,
+        a.ERROR_PRI,
+        (
+        SELECT
+        su.realname
+        FROM
+        sys_user su
+        WHERE
+        su.id = a.CONFIRM_OP
+        ) CONFIRM_OP,
+        a.BAK,
+        a.DATA_STATUS,
+        a.ERROR_CONFIRM
+        FROM
+        DEVICE_ERROR_INFO a
+        WHERE 1 = 1
+        <if test="deviceErrEntity.beginTime != null" >
+            AND str_to_date(a.ERROR_TIME, '%Y-%m-%d') <![CDATA[ >= ]]> str_to_date(#{deviceErrEntity.beginTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+        </if>
+        <if test="deviceErrEntity.endTime != null" >
+            AND str_to_date(a.ERROR_TIME, '%Y-%m-%d') <![CDATA[ <= ]]> str_to_date(#{deviceErrEntity.endTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+        </if>
+        <if test="deviceErrEntity.machineCode != null" >
+            AND a.MACHIN_CODE = #{deviceErrEntity.machineCode,jdbcType=VARCHAR}
+        </if>
+        <if test="deviceErrEntity.errorConfirm != null" >
+            AND a.ERROR_CONFIRM = #{deviceErrEntity.errorConfirm,jdbcType=VARCHAR}
+        </if>
+        ORDER BY ERROR_TIME DESC
+    </select>
+
+    <!--提交控制设备指令-->
+    <update id="deviceErrDeal" parameterType="org.jeecg.modules.business.vo.DeviceErrEntity" >
+        update device_error_info a
+        set a.error_confirm = '1',
+        a.confirm_op = #{opCode,jdbcType=VARCHAR},
+        a.bak = #{bak,jdbcType=VARCHAR},
+        a.confirm_time = sysdate()
+        where a.error_rec_id = cast(#{errorRecId,jdbcType=VARCHAR} as signed)
+    </update>
+<!--   ##########################设备错误###############################################################-->
+<!--   ###########################设备实时状态##############################################################-->
+    <!--设备动态信息查询-->
+    <resultMap id="deviceBroadViewResultMap" type="org.jeecg.modules.business.vo.DeviceBroadEntity">
+        <id column="broad_rec_id" jdbcType="INTEGER" property="broadRecId" />
+        <result column="broad_time" jdbcType="VARCHAR" property="broadTime" />
+        <result column="broad_dec" jdbcType="VARCHAR" property="broadDec" />
+        <result column="MACHIN_CODE" jdbcType="VARCHAR" property="machineCode" />
+        <result column="MACHIN_NAME" jdbcType="VARCHAR" property="machinName" />
+        <result column="FLOW_ID" jdbcType="VARCHAR" property="flowId" />
+        <result column="FLOW_NAME" jdbcType="VARCHAR" property="flowName" />
+        <result column="device_broad_pri" jdbcType="VARCHAR" property="deviceBroadPri" />
+    </resultMap>
+
+    <select id="qryDeviceBroadList"  resultMap="deviceBroadViewResultMap" parameterType="org.jeecg.modules.business.vo.DeviceBroadEntity">
+       select
+        a.broad_rec_id,
+        a.broad_time,
+        a.broad_dec,
+        a.MACHIN_CODE,
+        a.device_broad_pri,
+        a.FLOW_ID
+        from DEVICE_BROAD_INFO a
+        where 1=1
+        <if test="deviceBroadEntity.deviceBroadPri != null" >
+            AND a.device_broad_pri = #{deviceBroadEntity.deviceBroadPri,jdbcType=VARCHAR}
+        </if>
+        <if test="deviceBroadEntity.beginTime != null" >
+            AND str_to_date(A.BROAD_TIME, '%Y-%m-%d') <![CDATA[ >= ]]> str_to_date(#{deviceBroadEntity.beginTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+        </if>
+        <if test="deviceBroadEntity.endTime != null" >
+            AND str_to_date(A.BROAD_TIME, '%Y-%m-%d') <![CDATA[ <= ]]> str_to_date(#{deviceBroadEntity.endTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+        </if>
+        <if test="deviceBroadEntity.machineCode != null" >
+            AND A.MACHIN_CODE = #{deviceBroadEntity.machineCode,jdbcType=VARCHAR}
+        </if>
+        order by a.broad_time desc
+    </select>
+<!--   ###############################设备实时状态##########################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+<!--   #########################################################################################-->
+</mapper>

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.CabinetInfoMapper">
+
+
+    <resultMap id="CabinetOpRecResultMap" type="org.jeecg.modules.business.vo.CabinetOpRecEntity">
+        <result column="rec_his_id" jdbcType="INTEGER" property="recHisId" />
+        <result column="gg_name" jdbcType="VARCHAR" property="ggName" />
+        <result column="cc_name" jdbcType="VARCHAR" property="ccName" />
+        <result column="ww_name" jdbcType="VARCHAR" property="wwName" />
+        <result column="id_name" jdbcType="VARCHAR" property="idName" />
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="is_enabled" jdbcType="VARCHAR" property="isEnabled" />
+        <result column="is_enabled_name" jdbcType="VARCHAR" property="isEnabledName" />
+        <result column="deposit_time" jdbcType="VARCHAR" property="depositTime" />
+        <result column="make_sample_time" jdbcType="VARCHAR" property="makeSampleTime" />
+        <result column="sample_type" jdbcType="VARCHAR" property="sampleType" />
+        <result column="sample_type_name" jdbcType="VARCHAR" property="sampleTypeName" />
+        <!--beilun6mm3个瓶子-->
+        <result column="sample_type_name_bl" jdbcType="VARCHAR" property="sampleTypeName_bl" />
+        <result column="sample_type_name_jb" jdbcType="VARCHAR" property="sampleTypeName_jb" />
+        <result column="pack_code" jdbcType="VARCHAR" property="packCode" />
+        <result column="sample_status" jdbcType="VARCHAR" property="sampleStatus" />
+        <result column="sample_status_name" jdbcType="VARCHAR" property="sampleStatusName" />
+        <result column="insert_time" jdbcType="VARCHAR" property="insertTime" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="op_type" jdbcType="VARCHAR" property="opType" />
+        <result column="op_dest" jdbcType="VARCHAR" property="opDest" />
+        <result column="op_time" jdbcType="VARCHAR" property="opTime" />
+        <result column="op_result" jdbcType="VARCHAR" property="opResult" />
+        <result column="data_status" jdbcType="VARCHAR" property="dataStatus" />
+        <result column="sampling_code" jdbcType="VARCHAR" property="samplingCode" />
+        <result column="batchNo_fc" jdbcType="VARCHAR" property="batchNofc" />
+        <result column="samplingCode_fc" jdbcType="VARCHAR" property="samplingCodefc" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="sample_weight" jdbcType="VARCHAR" property="sampleWeight" />
+        <result column="appr_status" jdbcType="VARCHAR" property="apprStatus" />
+        <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+        <result column="update_name" jdbcType="VARCHAR" property="updateName" />
+    </resultMap>
+
+    <resultMap id="CabinetInfoResultMap" type="org.jeecg.modules.business.vo.CabinetEntity">
+        <id column="cabinet_rec_id" jdbcType="INTEGER" property="cabinetRecId" />
+        <result column="gg_name" jdbcType="VARCHAR" property="ggName" />
+        <result column="cc_name" jdbcType="VARCHAR" property="ccName" />
+        <result column="ww_name" jdbcType="VARCHAR" property="wwName" />
+        <result column="pp_name" jdbcType="VARCHAR" property="ppName" />
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="sampling_code" jdbcType="VARCHAR" property="samplingCode" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="id_name" jdbcType="VARCHAR" property="idName" />
+        <result column="is_enabled" jdbcType="VARCHAR" property="isEnabled" />
+        <result column="is_enabled_name" jdbcType="VARCHAR" property="isEnabledName" />
+        <result column="deposit_time" jdbcType="VARCHAR" property="depositTime" />
+        <result column="make_sample_time" jdbcType="VARCHAR" property="makeSampleTime" />
+        <result column="sample_type" jdbcType="VARCHAR" property="sampleType" />
+        <result column="sample_type_name" jdbcType="VARCHAR" property="sampleTypeName" />
+        <result column="sample_type_name_bl" jdbcType="VARCHAR" property="sampleTypeName_bl" />
+        <result column="sample_type_name_jb" jdbcType="VARCHAR" property="sampleTypeName_jb" />
+        <result column="pack_code" jdbcType="VARCHAR" property="packCode" />
+        <result column="sample_status" jdbcType="VARCHAR" property="sampleStatus" />
+        <result column="sample_status_name" jdbcType="VARCHAR" property="sampleStatusName" />
+        <result column="insert_time" jdbcType="VARCHAR" property="insertTime" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="op_name" jdbcType="VARCHAR" property="opName" />
+        <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+        <result column="update_code" jdbcType="VARCHAR" property="updateCode" />
+        <result column="update_name" jdbcType="VARCHAR" property="updateName" />
+        <result column="totalCnt" jdbcType="VARCHAR" property="totalCnt" />
+        <result column="usedCnt" jdbcType="VARCHAR" property="usedCnt" />
+        <result column="leftCnt" jdbcType="VARCHAR" property="leftCnt" />
+        <result column="exceptCnt" jdbcType="VARCHAR" property="exceptCnt" />
+        <result column="normalCnt" jdbcType="VARCHAR" property="normalCnt" />
+        <result column="outtimeCnt" jdbcType="VARCHAR" property="outtimeCnt" />
+        <result column="delay_num" jdbcType="VARCHAR" property="delayDays" />
+        <result column="ext_rec_id" jdbcType="VARCHAR" property="extRecId" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="batch_no_type" jdbcType="VARCHAR" property="batchNoType" />
+        <result column="arguementFlag" jdbcType="VARCHAR" property="arguementFlag" />
+        <result column="overTime" jdbcType="VARCHAR" property="overTime" />
+    </resultMap>
+
+    <!-- 存样柜历史记录查询 -->
+    <select id="qryCabinetOpRecList"   resultMap="CabinetOpRecResultMap" >
+        select a.rec_his_id,
+        a.gg_name,
+        a.cc_name,
+        a.ww_name,
+        get_batch_no_by_packcd(a.pack_code) batch_no,
+        get_sampling_code_by_packcd(a.pack_code) sampling_code,
+        (select max(m.batch_no) from batch_no_info m,prepar_sampling_rec n where m.sampling_code = n.sampling_code and HEXTOASCII(n.pack_code) = a.pack_code) batchNo_fc,
+        (select max(m.sampling_code) from prepar_sampling_rec m where HEXTOASCII(m.pack_code) = a.pack_code) samplingCode_fc,
+        date_format(a.make_sample_time, '%Y-%m-%d %H:%i:%S') make_sample_time,
+        a.sample_type,
+        a.pack_code,
+        a.operator op_name,
+        a.op_type,
+        a.dest_name op_dest,
+        date_format(a.op_time, '%Y-%m-%d %H:%i:%S') op_time,
+        a.is_successed op_result
+        from cabinet_op_rec_his a
+        where 1=1
+        <if test="cabinetOpRecEntity.sampleType != null" >
+            and a.sample_type = #{cabinetOpRecEntity.sampleType,jdbcType=VARCHAR}
+        </if>
+        <if test="cabinetOpRecEntity.packCode != null" >
+            and a.pack_Code = #{cabinetOpRecEntity.packCode,jdbcType=VARCHAR}
+        </if>
+        <if test="cabinetOpRecEntity.depositStartTime != null">
+            and a.op_time <![CDATA[>=]]> str_to_date(#{cabinetOpRecEntity.depositStartTime,jdbcType=VARCHAR}, '%Y-%m-%d')
+        </if>
+        <if test="cabinetOpRecEntity.depositEndTime != null">
+            and a.op_time <![CDATA[<]]> str_to_date(#{cabinetOpRecEntity.depositEndTime,jdbcType=VARCHAR}, '%Y-%m-%d') + 1 - 0.00001
+        </if>
+        <if test="cabinetOpRecEntity.batchNoType != null" >
+            and   get_batch_type_by_packcd(a.pack_code) = #{cabinetOpRecEntity.batchNoType,jdbcType=VARCHAR}
+        </if>
+        <if test="cabinetOpRecEntity.opName != null" >
+            and  <![CDATA[ a.operator <> #{cabinetOpRecEntity.opName} ]]>
+        </if>
+        order by a.op_time desc
+    </select>
+
+
+
+    <select id="qryCabinetInfoList" parameterType="org.jeecg.modules.business.vo.CabinetEntity"  resultMap="CabinetInfoResultMap" >
+        select cabinet_rec_id,
+        gg_name,
+        cc_name,
+        ww_name,
+        get_batch_no_by_packcd(a.pack_code) batch_no,
+        get_overtime_by_packcd(a.pack_code) overTime,
+        concat('img',lpad(substring(a.cc_name,2),2,'0'),lpad(a.ww_name,2,'0')) id_name,
+        is_enabled,
+        date_format(deposit_time,'%Y-%m-%d %H:%i:%S') deposit_time,
+        date_format(make_sample_time,'%Y-%m-%d %H:%i:%S') make_sample_time,
+        sample_type,
+        pack_code,
+        sample_status,
+        date_format(insert_time,'%Y-%m-%d %H:%i:%S')  insert_time,
+        op_code,
+        (select realname from sys_user where user_id = convert(a.op_code,signed)) op_name,
+        date_format(update_time,'%Y-%m-%d %H:%i:%S') update_time,
+        update_code,
+        (select realname from sys_user where id = convert(a.op_code,signed)) update_name,
+        (select b.delay_num from cabinet_info_ext b where b.pack_code = a.pack_code) delay_num
+        from cabinet_info a
+        where 1=1
+        <if test="ggName != null" >
+            and a.gg_name = #{ggName,jdbcType=VARCHAR}
+        </if>
+        <if test="ccLikeName != null" >
+            and a.cc_name like #{ccLikeName,jdbcType=VARCHAR}
+        </if>
+        <if test="ccName != null" >
+            and a.cc_name = #{ccName,jdbcType=VARCHAR}
+        </if>
+        <if test="wwName != null" >
+            and a.ww_name = #{wwName,jdbcType=VARCHAR}
+        </if>
+        <if test="sampleStatus != null" >
+            and a.sample_status in (#{sampleStatus,jdbcType=VARCHAR}, '3')
+        </if>
+        <if test="apprEventId != null" >
+            and a.cabinet_rec_id in (select cast(rb.param4 as signed) from appr_req_data_buffer rb where rb.param1 = #{apprEventId,jdbcType=VARCHAR})
+        </if>
+        <if test="sampleType != null" >
+            and a.sample_type = #{sampleType,jdbcType=VARCHAR}
+        </if>
+        <if test="depositStartTime != null">
+            <![CDATA[
+                     and A.deposit_time >= date_format(#{depositStartTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%S')
+                     ]]>
+        </if>
+        <if test="depositEndTime != null">
+            <![CDATA[
+                     and A.deposit_time <= date_format(#{depositEndTime,jdbcType=VARCHAR},'%Y-%m-%d %H:%i:%S')
+                     ]]>
+        </if>
+        <if test="batchNo != null or laborCode != null or venNo != null">
+            AND A.PACK_CODE in (SELECT D.PACK_CODE
+            FROM BATCH_NO_INFO C, prepar_sampling_rec D
+            WHERE 1 = 1
+            AND C.SAMPLING_CODE = D.SAMPLING_CODE
+            <if test="laborCode != null">
+                AND C.LABOR_CODE = #{laborCode,jdbcType=VARCHAR}
+            </if>
+            <if test="batchNo != null">
+                AND C.BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+            </if>
+            <if test="venNo != null">
+                AND C.VEN_NO = #{venNo,jdbcType=VARCHAR}
+            </if>
+            )
+        </if>
+        order by get_batch_no_by_packcd(a.pack_code) desc
+    </select>
+
+
+</mapper>

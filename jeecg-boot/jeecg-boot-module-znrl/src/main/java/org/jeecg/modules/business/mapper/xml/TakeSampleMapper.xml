@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.TakeSampleMapper">
+
+    <resultMap id="sampleRptResultMap" type="org.jeecg.modules.business.vo.SampleRptEntity">
+        <result column="sample_code" jdbcType="VARCHAR" property="sampleCode" />
+        <result column="sampling_code" jdbcType="VARCHAR" property="samplingCode" />
+        <result column="batch_type_name" jdbcType="VARCHAR" property="batchTypeName" />
+        <result column="start_time" jdbcType="VARCHAR" property="startTime" />
+        <result column="end_time" jdbcType="VARCHAR" property="endTime" />
+        <result column="coal_name" jdbcType="VARCHAR" property="coalName" />
+        <result column="ven_name" jdbcType="VARCHAR" property="venName" />
+        <result column="mine_name" jdbcType="VARCHAR" property="mineName" />
+        <result column="sample_type" jdbcType="VARCHAR" property="sampleType" />
+        <result column="sample_cnt" jdbcType="VARCHAR" property="sampleCnt" />
+        <result column="car_id" jdbcType="VARCHAR" property="carId" />
+        <result column="car_cnt" jdbcType="VARCHAR" property="carCnt" />
+        <result column="total_net_qty" jdbcType="VARCHAR" property="totalNetQty"/>
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="batch_no_type" jdbcType="VARCHAR" property="batchNoType" />
+        <result column="machine_code" jdbcType="VARCHAR" property="machineCode" />
+        <result column="sample_typ" jdbcType="VARCHAR" property="sampleTyp" />
+        <result column="sample_qty" jdbcType="VARCHAR" property="sampleQty" />
+        <result column="sample_rat" jdbcType="VARCHAR" property="suofenCnt" />
+        <result column="sample_cnt_new" jdbcType="VARCHAR" property="sampleCntNew" />
+        <result column="user_code" jdbcType="VARCHAR" property="userCode" />
+        <result column="sample_usage_rate" jdbcType="VARCHAR" property="usageRate" />
+        <result column="sample_freq" jdbcType="VARCHAR" property="sampleFrequence" />
+        <result column="sample_gap" jdbcType="VARCHAR" property="sampleGape" />
+        <result column="barrel_code" jdbcType="VARCHAR" property="barrelCode" />
+        <result column="barrel_cnt" jdbcType="VARCHAR" property="barrelCnt" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+
+        <result column="autoSampleBatchCnt" jdbcType="VARCHAR" property="autoSampleBatchCnt" />
+        <result column="manualSampleBatchCnt" jdbcType="VARCHAR" property="manualSampleBatchCnt" />
+        <result column="autoSampleRate" jdbcType="VARCHAR" property="autoSampleRate" />
+        <result column="autoSamplingBatchCnt" jdbcType="VARCHAR" property="autoSamplingBatchCnt" />
+        <result column="manualSamplingBatchCnt" jdbcType="VARCHAR" property="manualSamplingBatchCnt" />
+        <result column="autoSamplingRate" jdbcType="VARCHAR" property="autoSamplingRate" />
+        <result column="batch_time" jdbcType="VARCHAR" property="batchTime" />
+        <result column="batchCnt" jdbcType="VARCHAR" property="batchCnt" />
+
+<!--        <result column="coordinateX1" jdbcType="VARCHAR" property="coordinateX1" />-->
+<!--        <result column="coordinateY1" jdbcType="VARCHAR" property="coordinateY1" />-->
+<!--        <result column="coordinateX2" jdbcType="VARCHAR" property="coordinateX2" />-->
+<!--        <result column="coordinateY2" jdbcType="VARCHAR" property="coordinateY2" />-->
+<!--        <result column="coordinateX3" jdbcType="VARCHAR" property="coordinateX3" />-->
+<!--        <result column="coordinateY3" jdbcType="VARCHAR" property="coordinateY3" />-->
+<!--        <result column="suofenInterval" jdbcType="VARCHAR" property="suofenInterval" />-->
+        <result column="boiler_no" jdbcType="VARCHAR" property="boilerNo" />
+        <result column="goods_receiver" jdbcType="VARCHAR" property="goodsReceiver" />
+        <result column="sample_size" jdbcType="VARCHAR" property="sampleSize" />
+        <result column="bc" jdbcType="VARCHAR" property="bc" />
+
+        <result column="weight_time" jdbcType="VARCHAR" property="weightTime" />
+        <result column="balance_no" jdbcType="VARCHAR" property="balanceNo" />
+        <result column="weight" jdbcType="VARCHAR" property="weight" />
+        <result column="barrel_id" jdbcType="VARCHAR" property="barrelId" />
+        <result column="sample_team_no" jdbcType="VARCHAR" property="teamNo" />
+        <result column="sample_class_no" jdbcType="VARCHAR" property="classNo" />
+    </resultMap>
+<!--分页查询-->
+    <select id="qryTakeSampleBasicList" parameterType="org.jeecg.modules.business.vo.SampleRptEntity" resultMap="sampleRptResultMap" >
+
+        select t.*
+        from ( SELECT
+        c.batch_no,
+        (
+        CASE c.batch_no_type
+        WHEN '0' THEN
+        '汽车煤批次'
+        WHEN '1' THEN
+        '火车煤批次'
+        WHEN '2' THEN
+        '轮船煤批次'
+        WHEN '3' THEN
+        '场地煤批次'
+        WHEN '5' THEN
+        '系统外批次'
+        WHEN '6' THEN
+        '船煤抽检批次'
+        WHEN '7' THEN
+        '火车抽检批次'
+        WHEN '8' THEN
+        '汽车抽检批次'
+        WHEN '9' THEN
+        '入炉煤批次'
+        ELSE
+        '系统外批次'
+        END
+        ) AS batch_type_name,
+        c.sample_code,
+        c.sampling_code,
+        (
+        SELECT
+        (
+        CASE SAMPLE_TYP
+        WHEN 0 THEN
+        '皮带采样'
+        WHEN 1 THEN
+        '皮带大水分旁路'
+        WHEN 2 THEN
+        '人工采样'
+        WHEN 3 THEN
+        '车厢采样'
+        WHEN 4 THEN
+        '车厢大水分旁路'
+        END
+        )
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        LIMIT 1
+        ) sample_type,
+        (
+        SELECT
+        sample_typ
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        LIMIT 1
+        ) sample_typ,
+        (
+        SELECT
+        sample_qty
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        LIMIT 1
+        ) sample_qty,
+        (
+        SELECT
+        op_code
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        LIMIT 1
+        ) user_code,
+        (
+        SELECT
+        ifnull(max(sample_cnt), 0)
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        ) sample_cnt,
+        (
+        SELECT
+        ifnull(sum(sample_freq), 0)
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        ) sample_freq,
+        (
+        SELECT
+        ifnull(max(sample_gap), 0)
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        ) sample_gap,
+        (
+        SELECT
+        machine_code
+        FROM
+        take_sample_rec
+        WHERE
+        sample_code = c.sample_code
+        LIMIT 1
+        ) machine_code,
+        CASE
+        WHEN c.batch_no_type = '0' THEN
+        (
+        SELECT
+        CONVERT (count(*), CHAR)
+        FROM
+        rlrecordmstqy bb5
+        WHERE
+        bb5.sample_code = c.sample_code
+        )
+        WHEN c.batch_no_type = '1' THEN
+        (
+        SELECT
+        CONVERT (count(*), CHAR)
+        FROM
+        rlrecordmsthy bb6
+        WHERE
+        bb6.sample_code = c.sample_code
+        )
+        WHEN c.batch_no_type IN ('9', '2', '3') THEN
+        (SELECT '0')
+        END car_cnt,
+        CASE
+        WHEN c.batch_no_type = '0' THEN
+        (
+        SELECT
+        min(bb7.start_time)
+        FROM
+        take_sample_rec bb7
+        WHERE
+        bb7.sample_code = c.sample_code
+        )
+        WHEN c.batch_no_type IN ('1', '9', '2', '3') THEN
+        (
+        SELECT
+        bb8.start_time
+        FROM
+        take_sample_rec bb8
+        WHERE
+        bb8.sample_code = c.sample_code
+        LIMIT 1
+        )
+        END start_time,
+        CASE
+        WHEN c.batch_no_type = '0' THEN
+        (
+        SELECT
+        max(bb9.end_time)
+        FROM
+        take_sample_rec bb9
+        WHERE
+        bb9.sample_code = c.sample_code
+        )
+        WHEN c.batch_no_type IN ('1', '9', '2', '3') THEN
+        (
+        SELECT
+        bb.end_time
+        FROM
+        take_sample_rec bb
+        WHERE
+        bb.sample_code = c.sample_code
+        LIMIT 1
+        )
+        END end_time,
+        (
+        SELECT
+        bb1.coal_name
+        FROM
+        coal_type bb1
+        WHERE
+        bb1.coal_no = c.coal_no
+        ) AS coal_name,
+        (
+        SELECT
+        bb2.ven_name
+        FROM
+        vendor_info bb2
+        WHERE
+        bb2.ven_no = c.ven_no
+        ) AS ven_name,
+        (
+        SELECT
+        bb3.mine_name
+        FROM
+        coal_mine bb3
+        WHERE
+        bb3.mine_no = c.mine_no
+        ) AS mine_name,
+        CASE
+        WHEN c.batch_no_type = '0' THEN
+        (
+        (
+        SELECT
+        sum(bb.net_qty)
+        FROM
+        rlrecordmstqy bb
+        WHERE
+        bb.sample_code = c.sample_code
+        ) / 1000
+        )
+        WHEN c.batch_no_type = '1' THEN
+        (
+        (
+        SELECT
+        sum(bb.net_qty)
+        FROM
+        rlrecordmsthy bb
+        WHERE
+        bb.sample_code = c.sample_code
+        ) / 1000
+        )
+        WHEN c.batch_no_type = '7' THEN
+        (
+        (
+        SELECT
+        sum(bb.net_qty)
+        FROM
+        rlrecordmsthy bb
+        WHERE
+        bb.attach_batch_no = c.batch_no
+        ) / 1000
+        )
+        WHEN c.batch_no_type = '8' THEN
+        (
+        (
+        SELECT
+        sum(bb.net_qty)
+        FROM
+        rlrecordmstqy bb
+        WHERE
+        bb.attach_batch_no = c.batch_no
+        ) / 1000
+        )
+        WHEN c.batch_no_type = '9' THEN
+        (
+        (
+        SELECT
+        sum(bb.all_net_qty)
+        FROM
+        batch_no_info bb
+        WHERE
+        bb.sample_code = c.sample_code
+        ) / 1000
+        )
+        WHEN c.batch_no_type = '2' THEN
+        (
+        SELECT
+        bb.all_net_qty
+        FROM
+        batch_no_info bb
+        WHERE
+        bb.sample_code = c.sample_code
+        )
+        WHEN c.batch_no_type = '3' THEN
+        (
+        SELECT
+        bb.all_net_qty
+        FROM
+        batch_no_info bb
+        WHERE
+        bb.sample_code = c.sample_code
+        )
+        END total_net_qty,
+        c.batch_no_type,
+        (
+        SELECT
+        user_name
+        FROM
+        take_sample_rec s
+        WHERE
+        s.sample_code = c.sample_code
+        LIMIT 1
+        ) user_name,
+        (select getBatchCarlds(c.batch_no,c.batch_no_type)) as  car_id
+        FROM
+        batch_no_info c
+        where 1 = 1
+        <if test="sampleRptEntity.batchNo != null">
+            and c.batch_no = #{sampleRptEntity.batchNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test="sampleRptEntity.sampleCode != null" >
+            and c.sample_code = #{sampleRptEntity.sampleCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="sampleRptEntity.samplingCode != null" >
+            and c.sampling_code = #{sampleRptEntity.samplingCode,jdbcType=VARCHAR}
+        </if>
+
+        <if test="sampleRptEntity.startTime != null" >
+            and date_format(c.insert_time,'%Y-%m-%d') &gt;= date_format(#{sampleRptEntity.startTime,jdbcType=VARCHAR},'%Y-%m-%d')
+        </if>
+
+        <if test="sampleRptEntity.endTime != null" >
+            and date_format(c.insert_time,'%Y-%m-%d') &lt; date_format(#{sampleRptEntity.endTime,jdbcType=VARCHAR},'%Y-%m-%d')
+        </if>
+
+        <if test="sampleRptEntity.batchNoType != null" >
+            and c.batch_no_type = #{sampleRptEntity.batchNoType,jdbcType=VARCHAR}
+        </if>
+        order by c.insert_time desc) t
+        where 1 = 1
+        <if test="sampleRptEntity.sampleTyp != null">
+            and t.sample_typ = #{sampleRptEntity.sampleTyp,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
+<!--修改采样结果-->
+    <select id="updateRecord" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.SampleRptEntity">
+        {call sample_result_record(#{jsonString,mode=IN,jdbcType=VARCHAR},
+        #{opCode,mode=IN,jdbcType=VARCHAR},
+        #{resCode,mode=OUT,jdbcType=VARCHAR},
+        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+</mapper>

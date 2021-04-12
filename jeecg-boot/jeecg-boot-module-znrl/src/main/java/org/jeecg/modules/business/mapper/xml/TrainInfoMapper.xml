@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.TrainInfoMapper">
+
+    <!-- 通用分页查询组件 -->
+    <sql id="paging_top_sql">
+        select * from (
+    </sql>
+
+    <sql id="paging_bottom_sql">
+        ) t where t.rownumber between #{beginRowIndex,jdbcType=INTEGER} and #{endRowIndex,jdbcType=INTEGER}
+    </sql>
+
+
+
+<!--    <select id="trainRegister" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.p_train_register(#{insertString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{deleteString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash;批量录大票&ndash;&gt;-->
+<!--    <select id="batchTrainDPRecord" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.batch_record_dp(#{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+
+<!--    &lt;!&ndash;批量录大票并同时分批&ndash;&gt;-->
+<!--    <select id="batchTrainDPRecordAndBatch" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.batch_record_dp_and_batch(#{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash;新增火车，可以在原来车次上新增，也可以新增测试&ndash;&gt;-->
+<!--    <select id="addNewTrain" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.add_new_train(#{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash;合并火车车次&ndash;&gt;-->
+<!--    <select id="mergeTrain" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.merge_train(#{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash;拆分出新车次&ndash;&gt;-->
+<!--    <select id="splitTrain" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.split_train(#{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash;调整火车顺序&ndash;&gt;-->
+<!--    <select id="adjustTrainOrder" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.adjustTrainOrder(#{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+
+<!--    <select id="dealTrainBatchInfo" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.dealTrainBatchInfo(#{trainNo,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+<!--    删除单个车厢，并进行重新排序-->
+    <select id="deleteOneTrain" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">
+        {call pk_register.delete_One_Train_Info(#{recordNo,mode=IN,jdbcType=VARCHAR},
+        #{opCode,mode=IN,jdbcType=VARCHAR},
+        #{resCode,mode=OUT,jdbcType=VARCHAR},
+        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+<!--    <select id="confirmTrainDump" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.confirm_train_dump(#{recordNo,mode=IN,jdbcType=VARCHAR},-->
+<!--                                            #{opCode,mode=IN,jdbcType=VARCHAR},-->
+<!--                                            #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--                                            #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+    <resultMap id="TrainDetailListResultMap" type="org.jeecg.modules.business.vo.RegisterEntity">
+        <id column="record_no" jdbcType="INTEGER" property="recordNo" />
+        <result column="old_CarId" jdbcType="VARCHAR" property="oldCarId" />
+        <result column="train_no" jdbcType="VARCHAR" property="trainNo" />
+        <result column="sample_code" jdbcType="VARCHAR" property="sampleCode" />
+        <result column="man_check_sample" jdbcType="VARCHAR" property="manCheckSample" />
+        <result column="car_id" jdbcType="VARCHAR" property="carId" />
+        <result column="xh_num" jdbcType="VARCHAR" property="xhNum" />
+        <result column="sample_typ" jdbcType="VARCHAR" property="sampleTyp" />
+        <result column="empty_flg" jdbcType="VARCHAR" property="emptyFlg" />
+        <result column="sample_typ_name" jdbcType="VARCHAR" property="sampleTypName" />
+        <result column="empty_flg_name" jdbcType="VARCHAR" property="emptyFlgName" />
+        <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+        <result column="contract_name" jdbcType="VARCHAR" property="contractName" />
+        <result column="colry_no" jdbcType="VARCHAR" property="colryNo" />
+        <result column="coal_no" jdbcType="VARCHAR" property="coalNo" />
+        <result column="ven_no" jdbcType="VARCHAR" property="venNo" />
+        <result column="leave_dtm" jdbcType="VARCHAR" property="leaveDtm" />
+        <result column="record_dtm" jdbcType="VARCHAR" property="recordDtm" />
+        <result column="cz_dtm" jdbcType="VARCHAR" property="czDtm" />
+        <result column="tick_qty" jdbcType="VARCHAR" property="tickQty" />
+        <result column="mz_qty" jdbcType="VARCHAR" property="mzQty" />
+        <result column="pz_qty" jdbcType="VARCHAR" property="pzQty" />
+        <result column="net_qty" jdbcType="VARCHAR" property="netQty" />
+        <result column="yd_qty" jdbcType="VARCHAR" property="ydQty" />
+        <result column="kud_qty" jdbcType="VARCHAR" property="kudQty" />
+        <result column="bz_qty" jdbcType="VARCHAR" property="bzQty" />
+        <result column="loss_qty" jdbcType="VARCHAR" property="lossQty" />
+        <result column="xm_dtm" jdbcType="VARCHAR" property="fcTime" />
+        <result column="train_batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="attach_batch_no" jdbcType="VARCHAR" property="attachBatchNo" />
+        <result column="track_no" jdbcType="VARCHAR" property="trackNo" />
+        <result column="car_typ" jdbcType="VARCHAR" property="carTyp" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="mine_name" jdbcType="VARCHAR" property="mineName" />
+        <result column="coal_name" jdbcType="VARCHAR" property="coalName" />
+        <result column="ven_name" jdbcType="VARCHAR" property="venName" />
+        <result column="start_place" jdbcType="VARCHAR" property="startPlace" />
+        <result column="final_place" jdbcType="VARCHAR" property="finalPlace" />
+        <result column="start_place_name" jdbcType="VARCHAR" property="startPlaceName" />
+        <result column="final_place_name" jdbcType="VARCHAR" property="finalPlaceName" />
+        <result column="speed" jdbcType="VARCHAR" property="speed" />
+        <result column="aim_time" jdbcType="VARCHAR" property="aimTime" />
+        <result column="deliver_time" jdbcType="VARCHAR" property="deliverTime" />
+        <result column="balance_no" jdbcType="VARCHAR" property="balanceNo" />
+        <result column="purchase_type" jdbcType="VARCHAR" property="purchaseType" />
+        <result column="contract_type" jdbcType="VARCHAR" property="contractType" />
+        <result column="province_no" jdbcType="VARCHAR" property="provinceNo" />
+        <result column="update_code" jdbcType="VARCHAR" property="updateCode" />
+        <result column="update_name" jdbcType="VARCHAR" property="updateName" />
+        <result column="upload_status" jdbcType="VARCHAR" property="uploadStatus" />
+        <result column="cfm_flg" jdbcType="VARCHAR" property="cfmFlg" />
+        <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+        <result column="ykd" jdbcType="VARCHAR" property="ykd" />
+        <result column="goods_receiver" jdbcType="VARCHAR" property="goodsReceiver" />
+    </resultMap>
+
+<!--    <select id="qryTrainDetailList" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultMap="TrainDetailListResultMap" >-->
+<!--        select a.record_no,-->
+<!--        '' old_CarId,-->
+<!--        a.train_no,-->
+<!--        a.car_id,-->
+<!--        a.xh_num,-->
+<!--        a.sample_typ,-->
+<!--        a.sample_code,-->
+<!--        (select bb.sample_code from batch_no_info bb where bb.batch_no = a.attach_batch_no) man_check_sample,-->
+<!--        decode(a.sample_typ, '0','皮带采样','1','皮带大水分旁路','2','人工采样','3','车厢采样','4','车厢大水分旁路') sample_typ_name,-->
+<!--        a.empty_flg,-->
+<!--        decode(a.empty_flg, '0','是','1','否') empty_flg_name,-->
+<!--        a.contract_no,-->
+<!--        (select contract_name from contract_info where contract_no = a.contract_no) contract_name,-->
+<!--        a.colry_no,-->
+<!--        (select mine_name from COAL_MINE where mine_no = a.colry_no) mine_name,-->
+<!--        a.coal_no,-->
+<!--        (select coal_name from coal_type where coal_no = a.coal_no) coal_name,-->
+<!--        a.ven_no,-->
+<!--        (select for_short from VENDOR_INFO where ven_no = a.ven_no) ven_name,-->
+<!--        date_format(trunc(a.leave_dtm), 'yyyy-mm-dd')  leave_dtm,-->
+<!--        date_format(a.record_dtm, 'yyyy-mm-dd hh24:mi:ss') record_dtm,-->
+<!--        date_format(a.cz_dtm, 'yyyy-mm-dd hh24:mi:ss') cz_dtm,-->
+<!--        a.tick_qty/1000  tick_qty,-->
+<!--        a.mz_qty/1000  mz_qty,-->
+<!--        a.pz_qty/1000  pz_qty,-->
+<!--        a.net_qty/1000  net_qty,-->
+<!--        a.yd_qty/1000  yd_qty,-->
+<!--        a.kud_qty/1000  kud_qty,-->
+<!--        a.loss_qty/1000  loss_qty,-->
+<!--        decode(substr(a.car_typ, 3,2),'70','70','64','61','62','60') bz_qty,-->
+<!--        date_format(a.xm_dtm, 'yyyy-mm-dd hh24:mi:ss') xm_dtm,-->
+<!--        a.train_batch_no,-->
+<!--        a.attach_batch_no,-->
+<!--        a.track_no,-->
+<!--        a.car_typ,-->
+<!--        a.cfm_flg,-->
+<!--        a.car_spd speed,-->
+<!--        a.start_place,-->
+<!--        a.final_place,-->
+<!--        a.deliver_time,-->
+<!--        (select dt.name from dictionary_table dt where dt.type = 'START_RAIL_STATION' and dt.id = a.start_place) start_place_name,-->
+<!--        (select dt.name from dictionary_table dt where dt.type = 'FINAL_RAIL_STATION' and dt.id = a.final_place) final_place_name,-->
+<!--        date_format(a.aim_time, 'yyyy-mm-dd hh24:mi:ss') aim_time,-->
+<!--        a.remark,-->
+<!--&lt;!&ndash;        <if test="uploadStatus != null" >&ndash;&gt;-->
+<!--&lt;!&ndash;            get_batch2Mis_status(a.train_batch_no) upload_status,&ndash;&gt;-->
+<!--&lt;!&ndash;        </if>&ndash;&gt;-->
+<!--        a.balance_no-->
+<!--        from RLRECORDMSTHY a-->
+<!--        where 1 = 1-->
+<!--        <if test="trainNo != null" >-->
+<!--            and a.train_no = #{trainNo,jdbcType=VARCHAR}-->
+<!--        </if>-->
+
+<!--&lt;!&ndash;        <if test="attachBatchNo != null" >&ndash;&gt;-->
+<!--&lt;!&ndash;            and a.attach_batch_no is not null&ndash;&gt;-->
+<!--&lt;!&ndash;        </if>&ndash;&gt;-->
+<!--&lt;!&ndash;        <if test="xhNum != null" >&ndash;&gt;-->
+<!--&lt;!&ndash;            and a.xh_num  in (${xhNum})&ndash;&gt;-->
+<!--&lt;!&ndash;        </if>&ndash;&gt;-->
+<!--&lt;!&ndash;        <if test="batchNo != null" >&ndash;&gt;-->
+<!--&lt;!&ndash;            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}&ndash;&gt;-->
+<!--&lt;!&ndash;        </if>&ndash;&gt;-->
+<!--        order by a.track_no, a.xh_num-->
+<!--    </select>-->
+
+    <select id="qryTrainDetailListByPage" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultMap="TrainDetailListResultMap" >
+        select a.record_no,
+        '' old_CarId,
+        a.train_no,
+        a.car_id,
+        a.xh_num,
+        a.sample_typ,
+        a.sample_code,
+        (select bb.sample_code from batch_no_info bb where bb.batch_no = a.attach_batch_no) man_check_sample,
+        a.sample_typ,
+        a.empty_flg,
+        IF(a.empty_flg='0','是','否') empty_flg_name,
+        a.contract_no,
+        a.colry_no,
+        (select mine_name from COAL_MINE where mine_no = a.colry_no) mine_name,
+        a.coal_no,
+        (select coal_name from coal_type where coal_no = a.coal_no) coal_name,
+        a.ven_no,
+        (select for_short from VENDOR_INFO where ven_no = a.ven_no) ven_name,
+        date_format(a.leave_dtm, '%Y-%m-%d%H:%i:%S')  leave_dtm,
+        date_format(a.record_dtm, '%Y-%m-%d %H:%i:%S') record_dtm,
+        date_format(a.cz_dtm, '%Y-%m-%d %H:%i:%S') cz_dtm,
+        ROUND(a.tick_qty/1000,3)  tick_qty,
+        ROUND(a.mz_qty/1000,3)  mz_qty,
+        ROUND(a.pz_qty/1000,3)  pz_qty,
+        ROUND(a.net_qty/1000,3)  net_qty,
+        ROUND(a.yd_qty/1000,3)  yd_qty,
+        ROUND(a.kud_qty/1000,3)  kud_qty,
+        ROUND(a.loss_qty/1000,3)  loss_qty,
+        a.car_typ bz_qty,
+        date_format(a.xm_dtm, '%Y-%m-%d %H:%i:%S') xm_dtm,
+        a.train_batch_no,
+        a.attach_batch_no,
+        a.track_no,
+        a.car_typ,
+        a.cfm_flg,
+        a.car_spd speed,
+        a.start_place,
+        a.final_place,
+        a.deliver_time,
+        (select dt.name from dictionary_table dt where dt.type = 'START_RAIL_STATION' and dt.id = a.start_place) start_place_name,
+        (select dt.name from dictionary_table dt where dt.type = 'FINAL_RAIL_STATION' and dt.id = a.final_place) final_place_name,
+        date_format(a.aim_time, '%Y-%m-%d %H:%i:%S') aim_time,
+        a.remark,
+        a.balance_no
+        from RLRECORDMSTHY a
+        where 1 = 1
+        <if test="registerEntity.trainNo != null" >
+            and a.train_no = #{registerEntity.trainNo,jdbcType=VARCHAR}
+        </if>
+
+        <!--        <if test="attachBatchNo != null" >-->
+        <!--            and a.attach_batch_no is not null-->
+        <!--        </if>-->
+        <!--        <if test="xhNum != null" >-->
+        <!--            and a.xh_num  in (${xhNum})-->
+        <!--        </if>-->
+        <!--        <if test="batchNo != null" >-->
+        <!--            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}-->
+        <!--        </if>-->
+        order by a.track_no, a.xh_num
+    </select>
+<!--    <select id="qryTrainDetailListSummary" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultMap="TrainDetailListResultMap" >-->
+<!--        select-->
+<!--        sum(nvl(a.tick_qty,0)/1000)  tick_qty,-->
+<!--        sum(nvl(a.mz_qty,0)/1000)  mz_qty,-->
+<!--        sum(nvl(a.pz_qty,0)/1000)  pz_qty,-->
+<!--        sum(nvl(a.net_qty,0)/1000)  net_qty,-->
+<!--        sum(nvl(a.yd_qty,0)/1000)  yd_qty,-->
+<!--        sum(nvl(a.kud_qty,0)/1000)  kud_qty,-->
+<!--        sum(nvl(a.loss_qty,0)/1000)  loss_qty,-->
+<!--        sum((a.net_qty-nvl(a.tick_qty,a.net_qty)))/1000 ykd,-->
+<!--        count(1) xh_num-->
+<!--        from RLRECORDMSTHY a-->
+<!--        where 1 = 1-->
+<!--        <if test="trainNo != null" >-->
+<!--            and a.train_no = #{trainNo,jdbcType=VARCHAR}-->
+<!--        </if>-->
+
+<!--        <if test="attachBatchNo != null" >-->
+<!--            and a.attach_batch_no is not null-->
+<!--        </if>-->
+<!--        <if test="xhNum != null" >-->
+<!--            and a.xh_num  in (${xhNum})-->
+<!--        </if>-->
+
+<!--        <if test="batchNo != null" >-->
+<!--            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}-->
+<!--        </if>-->
+<!--    </select>-->
+
+<!--    <select id="qryOneTrainDetail" parameterType="java.lang.String" resultMap="TrainDetailListResultMap" >-->
+<!--        select a.record_no,-->
+<!--        '' old_CarId,-->
+<!--        a.train_no,-->
+<!--        a.car_id,-->
+<!--        a.xh_num,-->
+<!--        a.sample_typ,-->
+<!--        decode(a.sample_typ, '0','在线采样','1','离线采样') sample_typ_name,-->
+<!--        a.empty_flg,-->
+<!--        decode(a.empty_flg, '0','是','1','否') empty_flg_name,-->
+<!--        a.contract_no,-->
+<!--        (select contract_name from contract_info where contract_no = a.contract_no) contract_name,-->
+<!--        a.colry_no,-->
+<!--        (select mine_name from COAL_MINE where mine_no = a.colry_no) mine_name,-->
+<!--        a.coal_no,-->
+<!--        (select coal_name from coal_type where coal_no = a.coal_no) coal_name,-->
+<!--        a.ven_no,-->
+<!--        (select ven_name from VENDOR_INFO where ven_no = a.ven_no) ven_name,-->
+<!--        to_char(trunc(a.leave_dtm), 'yyyy-mm-dd')  leave_dtm,-->
+<!--        to_char(a.record_dtm, 'yyyy-mm-dd hh24:mi:ss') record_dtm,-->
+<!--        to_char(a.cz_dtm, 'yyyy-mm-dd hh24:mi:ss') cz_dtm,-->
+<!--        a.tick_qty/1000  tick_qty,-->
+<!--        a.mz_qty/1000  mz_qty,-->
+<!--        a.pz_qty/1000  pz_qty,-->
+<!--        a.net_qty/1000  net_qty,-->
+<!--        a.yd_qty/1000  yd_qty,-->
+<!--        a.kud_qty/1000  kud_qty,-->
+<!--        a.loss_qty/1000  loss_qty,-->
+<!--        to_char(a.xm_dtm, 'yyyy-mm-dd hh24:mi:ss') xm_dtm,-->
+<!--        a.train_batch_no,-->
+<!--        a.track_no,-->
+<!--        a.car_typ,-->
+<!--        a.car_spd speed,-->
+<!--        a.start_place,-->
+<!--        a.final_place,-->
+<!--        (select dt.name from dictionary_table dt where dt.type = 'START_RAIL_STATION' and dt.id = a.start_place) start_place_name,-->
+<!--        (select dt.name from dictionary_table dt where dt.type = 'RAIL_STATION' and dt.id = a.final_place) final_place_name,-->
+<!--        to_char(a.aim_time, 'yyyy-mm-dd hh24:mi:ss') aim_time,-->
+<!--        a.remark-->
+<!--        from RLRECORDMSTHY a-->
+<!--        where a.record_no = #{recordNo,jdbcType=VARCHAR}-->
+<!--    </select>-->
+
+    <resultMap id="TrainBasicListResultMap" type="org.jeecg.modules.business.vo.RegisterEntity">
+        <result column="train_no" jdbcType="VARCHAR" property="trainNo" />
+        <result column="train_no_alias" jdbcType="VARCHAR" property="trainNoAlias" />
+        <result column="record_dtm" jdbcType="VARCHAR" property="recordDtm" />
+        <result column="leave_dtm" jdbcType="VARCHAR" property="leaveDtm" />
+        <result column="car_cnt" jdbcType="VARCHAR" property="carCnt" />
+        <result column="total_net_qty" jdbcType="VARCHAR" property="totalNetQty" />
+        <result column="total_mz_qty" jdbcType="VARCHAR" property="totalMzQty" />
+        <result column="total_tick_qty" jdbcType="VARCHAR" property="totalTickQty" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="total_kud_qty" jdbcType="VARCHAR" property="totalKudQty" />
+        <result column="total_yd_qty" jdbcType="VARCHAR" property="totalYdQty" />
+        <result column="total_loss_qty" jdbcType="VARCHAR" property="totalLossQty" />
+    </resultMap>
+
+<!--    <select id="qryTrainBasicList" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultMap="TrainBasicListResultMap" >-->
+<!--        select t.train_no,-->
+<!--        t.train_no train_no_alias,-->
+<!--        t.car_cnt,-->
+<!--        t.total_net_qty,-->
+<!--        t.total_mz_qty,-->
+<!--        t.total_tick_qty,-->
+<!--        t.total_kud_qty,-->
+<!--        t.total_yd_qty,-->
+<!--        t.total_loss_qty,-->
+<!--        (select date_format(b.record_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b  where b.train_no = t.train_no order by b.record_dtm LIMIT 1) record_dtm,-->
+<!--        t.leave_dtm,-->
+<!--        (select c.remark from RLRECORDMSTHY c where c.train_no = t.train_no order by c.remark LIMIT 1) remark-->
+<!--        from (select a.train_no,-->
+<!--        (select date_format(b.record_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b where b.train_no = a.train_no order by b.record_dtm LIMIT 1) record_dtm,-->
+<!--        (select date_format(b.leave_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b where b.train_no = a.train_no order by b.leave_dtm LIMIT 1) leave_dtm,-->
+<!--        count(1) car_cnt,-->
+<!--        IFNULL(sum(a.net_qty), 0)/1000 total_net_qty,-->
+<!--        IFNULL(sum(a.mz_qty), 0)/1000 total_mz_qty,-->
+<!--        IFNULL(sum(a.tick_qty), 0)/1000 total_tick_qty,-->
+<!--        IFNULL(sum(a.kud_qty), 0)/1000 total_kud_qty,-->
+<!--        IFNULL(sum(a.yd_qty), 0)/1000 total_yd_qty,-->
+<!--        IFNULL(sum(a.loss_qty), 0)/1000 total_loss_qty-->
+<!--        from RLRECORDMSTHY a-->
+<!--        where 1 = 1-->
+
+<!--        <if test="trainNo != '' and trainNo != null" >-->
+<!--            and a.train_no = #{trainNo,jdbcType=VARCHAR}-->
+<!--        </if>-->
+
+<!--        <if test=" beginTime != '' and beginTime != null" >-->
+<!--            <![CDATA[-->
+<!--             and a.record_dtm >= to_date(#{beginTime,jdbcType=VARCHAR},'yyyy-mm-dd hh24:mi:ss')-->
+<!--             ]]>-->
+<!--        </if>-->
+<!--        <if test=" endTime != '' and endTime != null " >-->
+<!--            <![CDATA[-->
+<!--             and a.record_dtm <= to_date(#{endTime,jdbcType=VARCHAR},'yyyy-mm-dd hh24:mi:ss') + 1 - 0.00001-->
+<!--             ]]>-->
+<!--        </if>-->
+<!--        group by a.train_no) t-->
+<!--        order by t.record_dtm desc-->
+<!--    </select>-->
+
+
+    <select id="qryTrainBasicListByPage"  resultMap="TrainBasicListResultMap" >
+        select t.train_no,
+        t.train_no train_no_alias,
+        t.car_cnt,
+        t.total_net_qty,
+        t.total_mz_qty,
+        t.total_tick_qty,
+        t.total_kud_qty,
+        t.total_yd_qty,
+        t.total_loss_qty,
+        (select date_format(b.record_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b  where b.train_no = t.train_no order by b.record_dtm LIMIT 1) record_dtm,
+        t.leave_dtm,
+        (select c.remark from RLRECORDMSTHY c where c.train_no = t.train_no order by c.remark LIMIT 1) remark
+        from (select a.train_no,
+        (select date_format(b.record_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b where b.train_no = a.train_no order by b.record_dtm LIMIT 1) record_dtm,
+        (select date_format(b.leave_dtm, '%Y-%m-%d %H:%i:%S') from RLRECORDMSTHY b where b.train_no = a.train_no order by b.leave_dtm LIMIT 1) leave_dtm,
+        count(1) car_cnt,
+        ROUND(IFNULL(sum(a.net_qty), 0)/1000,3) total_net_qty,
+        ROUND(IFNULL(sum(a.mz_qty), 0)/1000,3) total_mz_qty,
+        ROUND(IFNULL(sum(a.tick_qty), 0)/1000,3) total_tick_qty,
+        ROUND(IFNULL(sum(a.kud_qty), 0)/1000,3) total_kud_qty,
+        ROUND(IFNULL(sum(a.yd_qty), 0)/1000,3) total_yd_qty,
+        ROUND(IFNULL(sum(a.loss_qty), 0)/1000,3) total_loss_qty
+        from RLRECORDMSTHY a
+        where 1 = 1
+
+        <if test="registerEntity.trainNo != '' and registerEntity.trainNo != null" >
+            and a.train_no = #{registerEntity.trainNo,jdbcType=VARCHAR}
+        </if>
+
+        <if test=" registerEntity.beginTime != '' and registerEntity.beginTime != null" >
+            <![CDATA[
+             and a.record_dtm >= str_to_date(#{registerEntity.beginTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%S')
+             ]]>
+        </if>
+        <if test=" registerEntity.beginTime != '' and registerEntity.beginTime != null " >
+            <![CDATA[
+             and a.record_dtm <= str_to_date(#{registerEntity.endTime,jdbcType=VARCHAR}, '%Y-%m-%d %H:%i:%S') + 1 - 0.00001
+             ]]>
+        </if>
+        group by a.train_no) t
+        order by t.record_dtm desc
+    </select>
+
+
+<!--    <delete id="deleteTrainInfo" parameterType="java.lang.String" >-->
+<!--        delete from RLRECORDMSTHY a-->
+<!--        where a.train_no = #{trainNo, jdbcType=VARCHAR}-->
+<!--    </delete>-->
+
+    <!--删除整个车次-->
+    <select id="deleteWholeTrain" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">
+        {call pk_register.delete_Whole_Train_Info(#{trainNo,mode=IN,jdbcType=VARCHAR},
+        #{opCode,mode=IN,jdbcType=VARCHAR},
+        #{resCode,mode=OUT,jdbcType=VARCHAR},
+        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+    <!--修改单个火车车厢信息-->
+    <select id="modifyOneTrainInfo" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">
+        {call pk_register.modify_One_Train_Info(#{updateString,mode=IN,jdbcType=VARCHAR},
+        #{resCode,mode=OUT,jdbcType=VARCHAR},
+        #{resMsg,mode=OUT,jdbcType=VARCHAR})}
+    </select>
+
+<!--    &lt;!&ndash;批量删除多余的火车车厢&ndash;&gt;-->
+<!--    <select id="deleteMassTrainBody" statementType="CALLABLE" parameterType="org.jeecg.modules.business.vo.RegisterEntity">-->
+<!--        {call pk_register.delete_trainBody(#{updateString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{publicString,mode=IN,jdbcType=VARCHAR},-->
+<!--        #{resCode,mode=OUT,jdbcType=VARCHAR},-->
+<!--        #{resMsg,mode=OUT,jdbcType=VARCHAR})}-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash;查询火车重量修改记录&ndash;&gt;-->
+<!--    <select id="qryOneTrainHisList" parameterType="org.jeecg.modules.business.vo.RegisterEntity" resultMap="TrainDetailListResultMap" >-->
+<!--        select a.record_no,-->
+<!--        '' old_CarId,-->
+<!--        a.train_no,-->
+<!--        a.car_id,-->
+<!--        a.xh_num,-->
+<!--        a.sample_typ,-->
+<!--        a.sample_code,-->
+<!--        (select bb.sample_code from batch_no_info bb where bb.batch_no = a.attach_batch_no) man_check_sample,-->
+<!--        decode(a.sample_typ, '0','皮带采样','1','皮带大水分旁路','2','人工采样','3','车厢采样','4','车厢大水分旁路') sample_typ_name,-->
+<!--        a.empty_flg,-->
+<!--        decode(a.empty_flg, '0','是','1','否') empty_flg_name,-->
+<!--        a.contract_no,-->
+<!--        (select contract_name from contract_info where contract_no = a.contract_no) contract_name,-->
+<!--        a.colry_no,-->
+<!--        (select mine_name from COAL_MINE where mine_no = a.colry_no) mine_name,-->
+<!--        a.coal_no,-->
+<!--        (select coal_name from coal_type where coal_no = a.coal_no) coal_name,-->
+<!--        a.ven_no,-->
+<!--        (select for_short from VENDOR_INFO where ven_no = a.ven_no) ven_name,-->
+<!--        to_char(trunc(a.leave_dtm), 'yyyy-mm-dd')  leave_dtm,-->
+<!--        to_char(a.record_dtm, 'yyyy-mm-dd hh24:mi:ss') record_dtm,-->
+<!--        to_char(a.cz_dtm, 'yyyy-mm-dd hh24:mi:ss') cz_dtm,-->
+<!--        a.tick_qty/1000  tick_qty,-->
+<!--        a.mz_qty/1000  mz_qty,-->
+<!--        a.pz_qty/1000  pz_qty,-->
+<!--        a.net_qty/1000  net_qty,-->
+<!--        a.yd_qty/1000  yd_qty,-->
+<!--        a.loss_qty/1000  loss_qty,-->
+<!--        decode(substr(a.car_typ, 3,2),'70','70','64','61','62','60') bz_qty,-->
+<!--        to_char(a.xm_dtm, 'yyyy-mm-dd hh24:mi:ss') xm_dtm,-->
+<!--        a.train_batch_no,-->
+<!--        a.attach_batch_no,-->
+<!--        a.track_no,-->
+<!--        a.car_typ,-->
+<!--        a.cfm_flg,-->
+<!--        a.car_spd speed,-->
+<!--        a.start_place,-->
+<!--        a.final_place,-->
+<!--        (select dt.name from dictionary_table dt where dt.type = 'START_RAIL_STATION' and dt.id = a.start_place) start_place_name,-->
+<!--        (select dt.name from dictionary_table dt where dt.type = 'FINAL_RAIL_STATION' and dt.id = a.final_place) final_place_name,-->
+<!--        to_char(a.aim_time, 'yyyy-mm-dd hh24:mi:ss') aim_time,-->
+<!--        a.remark,-->
+<!--        a.balance_no,-->
+<!--        nvl(a.weight_op_name,'') update_name,-->
+<!--        to_char(a.update_time, 'yyyy-mm-dd hh24:mi:ss') update_time-->
+<!--        from RLRECORDMSTHY_his a-->
+<!--        where 1 = 1-->
+<!--        <if test="trainNo != null" >-->
+<!--            and a.train_no = #{trainNo,jdbcType=VARCHAR}-->
+<!--        </if>-->
+
+<!--        <if test="attachBatchNo != null" >-->
+<!--            and a.attach_batch_no is not null-->
+<!--        </if>-->
+
+<!--        <if test="batchNo != null" >-->
+<!--            and a.train_batch_no = #{batchNo,jdbcType=VARCHAR}-->
+<!--        </if>-->
+<!--        <if test="recordNo != null" >-->
+<!--            and a.record_no = #{recordNo,jdbcType=VARCHAR}-->
+<!--        </if>-->
+<!--        <if test="netQty != null" >-->
+<!--            and a.net_qty is not null-->
+<!--        </if>-->
+<!--        order by a.log_date-->
+<!--    </select>-->
+
+</mapper>

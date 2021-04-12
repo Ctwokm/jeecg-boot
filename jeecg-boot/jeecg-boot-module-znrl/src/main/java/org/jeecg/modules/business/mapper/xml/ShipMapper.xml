@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.business.mapper.ShipMapper">
+    <resultMap id="shipResultMap" type="org.jeecg.modules.business.vo.ShipEntity" >
+        <result column="ship_rec_id" jdbcType="VARCHAR" property="shipRecId" />
+        <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+        <result column="contract_name" jdbcType="VARCHAR" property="contractName" />
+        <result column="ship_trans_no" jdbcType="VARCHAR" property="shipTransNo" />
+        <result column="carrier_no" jdbcType="VARCHAR" property="carrierNo" />
+        <result column="carrier_name" jdbcType="VARCHAR" property="carrierName" />
+        <result column="waybill_no" jdbcType="VARCHAR" property="waybillNo" />
+        <result column="water_tun" jdbcType="VARCHAR" property="waterTun" />
+        <result column="receiver_no" jdbcType="VARCHAR" property="receiverNo" />
+        <result column="receiver_name" jdbcType="VARCHAR" property="receiverName" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="status_name" jdbcType="VARCHAR" property="statusName" />
+        <result column="load_hours" jdbcType="VARCHAR" property="loadHours" />
+        <result column="unload_hours" jdbcType="VARCHAR" property="unloadHours" />
+        <result column="start_port_no" jdbcType="VARCHAR" property="startPortNo" />
+        <result column="start_port_name" jdbcType="VARCHAR" property="startPortName" />
+        <result column="final_port_no" jdbcType="VARCHAR" property="finalPortNo" />
+        <result column="final_port_name" jdbcType="VARCHAR" property="finalPortName" />
+        <result column="start_time" jdbcType="VARCHAR" property="startTime" />
+        <result column="estimate_time" jdbcType="VARCHAR" property="estimateTime" />
+        <result column="fact_time" jdbcType="VARCHAR" property="factTime" />
+        <result column="nor_time" jdbcType="VARCHAR" property="norTime" />
+        <result column="ship_id" jdbcType="VARCHAR" property="shipId" />
+        <result column="ship_code" jdbcType="VARCHAR" property="shipCode" />
+        <result column="ship_name" jdbcType="VARCHAR" property="shipName" />
+        <result column="ship_eng_name" jdbcType="VARCHAR" property="shipEngName" />
+        <result column="fix_ship_no" jdbcType="VARCHAR" property="fixShipNo" />
+        <result column="cabin_cnt" jdbcType="VARCHAR" property="cabinCnt" />
+        <result column="arrange_time" jdbcType="VARCHAR" property="arrangeTime" />
+        <result column="unload_time" jdbcType="VARCHAR" property="unloadTime" />
+        <result column="depart_time" jdbcType="VARCHAR" property="departTime" />
+        <result column="berth_no" jdbcType="VARCHAR" property="berthNo" />
+        <result column="op_code" jdbcType="VARCHAR" property="opCode" />
+        <result column="update_code" jdbcType="VARCHAR" property="updateCode" />
+
+        <result column="record_no" jdbcType="VARCHAR" property="recordNo" />
+        <result column="ven_no" jdbcType="VARCHAR" property="venNo" />
+        <result column="ven_name" jdbcType="VARCHAR" property="venName" />
+        <result column="mine_no" jdbcType="VARCHAR" property="mineNo" />
+        <result column="mine_name" jdbcType="VARCHAR" property="mineName" />
+        <result column="coal_no" jdbcType="VARCHAR" property="coalNo" />
+        <result column="coal_name" jdbcType="VARCHAR" property="coalName" />
+
+        <result column="current_batch_no" jdbcType="VARCHAR" property="currentBatchNo" />
+        <result column="current_sample_code" jdbcType="VARCHAR" property="currentSampleCode" />
+        <result column="current_sampling_code" jdbcType="VARCHAR" property="currentSamplingCode" />
+
+        <result column="cabin_nos" jdbcType="VARCHAR" property="cabinNos" />
+        <result column="tick_qty" jdbcType="VARCHAR" property="tickQty" />
+        <result column="all_tick_qty" jdbcType="VARCHAR" property="allTickQty" />
+        <result column="all_net_qty" jdbcType="VARCHAR" property="allNetQty" />
+        <result column="loss_type" jdbcType="VARCHAR" property="lossType" />
+        <result column="loss_type_name" jdbcType="VARCHAR" property="lossTypeName" />
+        <result column="kd_qty" jdbcType="VARCHAR" property="kdQty" />
+        <result column="sample_type" jdbcType="VARCHAR" property="sampleType" />
+        <result column="sample_type_name" jdbcType="VARCHAR" property="sampleTypeName" />
+        <result column="is_batch" jdbcType="VARCHAR" property="isBatch" />
+        <result column="is_batch_name" jdbcType="VARCHAR" property="isBatchName" />
+        <result column="depart_qty" jdbcType="VARCHAR" property="departQty" />
+        <result column="arrive_qty" jdbcType="VARCHAR" property="arriveQty" />
+        <result column="receive_qty" jdbcType="VARCHAR" property="receiveQty" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="sample_code" jdbcType="VARCHAR" property="sampleCode" />
+        <result column="sampling_code" jdbcType="VARCHAR" property="samplingCode" />
+        <result column="train_no" jdbcType="VARCHAR" property="trainNo" />
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="batch_time" jdbcType="VARCHAR" property="batchTime" />
+        <result column="upload_status" jdbcType="VARCHAR" property="uploadStatus" />
+        <result column="lossQty" jdbcType="VARCHAR" property="lossQty" />
+        <result column="lossQtyPercent" jdbcType="VARCHAR" property="lossQtyPercent" />
+    </resultMap>
+
+
+    <select id="recordByPage" resultMap="shipResultMap">
+        select
+        a.ship_rec_id,
+        a.ship_trans_no,
+        a.carrier_no,
+        (select ci.carrier_name from carrier_info AS ci where ci.carrier_no = a.carrier_no) AS carrier_name,
+        a.waybill_no,
+        a.water_tun,
+        a.receiver_no,
+        (select dt.name from dictionary_table AS dt where dt.type = 'GOODS_RECEIVER' and dt.id = a.receiver_no) AS receiver_name,
+        a.status,
+        a.load_hours,
+        a.unload_hours,
+        a.start_port_no,
+        (select dt.name from dictionary_table AS dt where dt.type = 'GOODS_RECEIVER' and dt.id = a.start_port_no) AS start_port_name,
+        a.final_port_no,
+        (select dt.name from dictionary_table AS dt where dt.type = 'GOODS_RECEIVER' and dt.id = a.final_port_no) AS final_port_name,
+        a.berth_no,
+        date_format(a.start_time, '%Y-%m-%d %H:%i:%s') start_time,
+        date_format(a.estimate_time, '%Y-%m-%d %H:%i:%s') estimate_time,
+        date_format(a.fact_time, '%Y-%m-%d %H:%i:%s') fact_time,
+        date_format(a.arrange_time, '%Y-%m-%d %H:%i:%s') arrange_time,
+        date_format(a.unload_time, '%Y-%m-%d %H:%i:%s') unload_time,
+        date_format(a.depart_time, '%Y-%m-%d %H:%i:%s') depart_time,
+        date_format(a.nor_time, '%Y-%m-%d %H:%i:%s') nor_time,
+        a.remark,
+        b.ship_name,
+        b.ship_eng_name,
+        b.ship_code,
+        b.ship_id,
+        b.fix_ship_no,
+        b.cabin_cnt<!--,
+        nvl(pk_ship.get_current_batchNo, '-') current_batch_no,
+        nvl(pk_ship.get_current_sampleCode, '-') current_sample_code,
+        nvl(pk_ship.get_current_samplingCode, '-') current_sampling_code-->
+        from ship_record AS a, ship_info AS b
+        where a.ship_id = b.ship_id
+        and a.rec_status = '1'
+        and (a.is_transfer = 'N' or a.is_transfer is null)
+        <if test="shipEntity.shipRecId != null" >
+            and a.ship_rec_id = #{shipEntity.shipRecId}
+        </if>
+        <if test="shipEntity.beginDate != null" >
+            and date_format (fact_time,'%Y-%m-%d') >=  date_format (#{shipEntity.beginDate},'%Y-%m-%d')
+        </if>
+        <if test="shipEntity.endDate != null" >
+            and date_format (fact_time,'%Y-%m-%d') &lt;= date_format (#{shipEntity.endDate},'%Y-%m-%d')
+        </if>
+        <if test="shipEntity.shipTransNo != null" >
+            and a.ship_trans_no = #{shipEntity.shipTransNo}
+        </if>
+        <if test="shipEntity.shipCode != null" >
+            and b.ship_code = #{shipEntity.shipCode}
+        </if>
+        <if test="shipEntity.status != null" >
+            and a.status = #{shipEntity.status}
+        </if>
+        <if test="shipEntity.shipId != null" >
+            and b.ship_id = #{shipEntity.shipId}
+        </if>
+        <if test="shipEntity.berthNo != null" >
+            and a.berth_no = #{shipEntity.berthNo}
+        </if>
+        order by a.fact_time desc
+	</select>
+
+    <select id="cargoRecordByPage" resultMap="shipResultMap" >
+        select a.record_no,
+        a.ship_rec_id,
+        a.ven_no,
+        (select v.ven_name from vendor_info AS v where v.ven_no = a.ven_no) ven_name,
+        a.mine_no,
+        (select cm.mine_name from coal_mine AS cm where cm.mine_no = a.mine_no) mine_name,
+        a.coal_no,
+        (select ct.coal_name from coal_type AS ct where ct.coal_no = a.coal_no) coal_name,
+        <!--a.carrier_no,
+        (select ci.carrier_name from carrier_info AS ci where ci.carrier_no = a.carrier_no) carrier_name,-->
+        a.cabin_nos,
+        a.tick_qty,
+        a.depart_qty,
+        a.arrive_qty,
+        a.receive_qty,
+        a.loss_type,
+        a.kd_qty,
+        a.sample_type,
+        f_ship_isBatch(a.ship_rec_id) is_batch,
+        date_format(a.insert_time, '%Y-%m-%d %H:%i:%s') fact_time,
+        a.remark
+        from ship_cargo_record AS a
+        where a.rec_status = '1'
+        <if test="shipEntity.recordNo != null" >
+            and a.record_no = #{shipEntity.recordNo,jdbcType=VARCHAR}
+        </if>
+        <if test="shipEntity.shipRecId != null" >
+            and a.ship_rec_id = #{shipEntity.shipRecId,jdbcType=VARCHAR}
+        </if>
+        <if test="shipEntity.beginDate != null" >
+            and a.insert_time >=  date_format (#{shipEntity.beginDate},'%Y-%m-%d')
+        </if>
+        <if test="shipEntity.endDate != null" >
+            and a.insert_time &lt;= date_format (#{shipEntity.endDate},'%Y-%m-%d')
+        </if>
+        order by a.record_no desc
+    </select>
+
+
+    <resultMap id="shipBatchResultMap" type="org.jeecg.modules.business.vo.ShipBatchEntity">
+        <result column="batch_no" jdbcType="VARCHAR" property="batchNo" />
+        <result column="day_batch_num" jdbcType="VARCHAR" property="dayBatchNum" />
+        <result column="ship_trans_no" jdbcType="VARCHAR" property="shipTransNo" />
+        <result column="ven_no" jdbcType="VARCHAR" property="venNo" />
+        <result column="mine_no" jdbcType="VARCHAR" property="mineNo" />
+        <result column="coal_no" jdbcType="VARCHAR" property="coalNo" />
+        <result column="ven_name" jdbcType="VARCHAR" property="venName" />
+        <result column="mine_name" jdbcType="VARCHAR" property="mineName" />
+        <result column="coal_name" jdbcType="VARCHAR" property="coalName" />
+        <result column="is_valid" jdbcType="VARCHAR" property="isValid" />
+        <result column="this_batch_qty" jdbcType="VARCHAR" property="thisBatchQty" />
+        <result column="sample_code" jdbcType="VARCHAR" property="sampleCode" />
+        <result column="sampling_code" jdbcType="VARCHAR" property="samplingCode" />
+        <result column="labor_code" jdbcType="VARCHAR" property="laborCode" />
+        <result column="batch_time" jdbcType="VARCHAR" property="batchTime" />
+    </resultMap>
+    <select id="shipBatchInfo" parameterType="org.jeecg.modules.business.vo.ShipBatchEntity" resultMap="shipBatchResultMap">
+        select a.batch_no,
+        b.ship_trans_no,
+        a.ven_no,
+        (select v.ven_name from vendor_info v where v.ven_no = a.ven_no) ven_name,
+        a.mine_no,
+        (select cm.mine_name from coal_mine cm where cm.mine_no = a.mine_no) mine_name,
+        a.coal_no,
+        (select ct.coal_name from coal_type ct where ct.coal_no = a.coal_no) coal_name,
+        a.sample_code,
+        a.sampling_code,
+        a.labor_code,
+        a.is_valid,
+        a.day_batch_num,
+        a.all_tick_qty this_batch_qty,
+        date_format(a.insert_time, '%Y-%m-%d %H:%i:%s') batch_time
+        from batch_no_info as a, ship_record as b
+        where a.train_no = b.ship_trans_no
+        and a.batch_no_type in (2,3)
+        and b.ship_rec_id = #{shipBatchEntity.shipRecId,jdbcType=VARCHAR}
+        order by a.day_batch_num
+    </select>
+
+    <update id="forceCompleteBatch" parameterType="org.jeecg.modules.business.vo.ShipBatchEntity" >
+        update batch_no_info a
+        set a.is_valid  = #{shipBatchEntity.isValid,jdbcType=VARCHAR},
+        a.update_time = sysdate(),
+        a.remark      = concat(date_format(sysdate(), '%Y-%m-%d %H:%i:%s'),'强制完成批次，操作工号：',#{shipBatchEntity.opCode,jdbcType=VARCHAR})
+        where a.sample_code = #{shipBatchEntity.sampleCode,jdbcType=VARCHAR}
+    </update>
+</mapper>
