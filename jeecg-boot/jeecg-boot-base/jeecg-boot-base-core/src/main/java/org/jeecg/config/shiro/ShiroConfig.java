@@ -69,6 +69,13 @@ public class ShiroConfig {
                 filterChainDefinitionMap.put(url,"anon");
             }
         }
+        filterChainDefinitionMap.put("/ureport/**", "anon"); //ureport表单设计
+//        filterChainDefinitionMap.put("/activiti/**", "anon"); //activiti测试
+//        filterChainDefinitionMap.put("/biztool/**", "anon"); //通用存过调用接口设计
+
+        filterChainDefinitionMap.put("/znrl/**", "anon"); //znrl调试开放接口
+        filterChainDefinitionMap.put("/modules/**", "anon"); //znrl调试开放接口
+        filterChainDefinitionMap.put("/activiti/traceImage/**", "anon"); //activiti流程图片查看，这个得放行
         // 配置不会被拦截的链接 顺序判断
         filterChainDefinitionMap.put("/sys/cas/client/validateLogin", "anon"); //cas验证登录
         filterChainDefinitionMap.put("/sys/randomImage/**", "anon"); //登录验证码接口排除

@@ -61,7 +61,7 @@ public class BizToolController {
 
 
     @ApiOperation(value="导出报表通用方法", notes="根据EXCEL模板和sql查询的数据组装报表")
-    @RequestMapping(value = "/exportXls")
+    @GetMapping(value = "/exportXls")
     public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
         TemplateExportParams params = new TemplateExportParams();
         params.setTemplateUrl("doc/trainDemo.xlsx");
