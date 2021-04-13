@@ -121,4 +121,4 @@ Vue.prototype.$success = Modal.success
 Vue.prototype.$error = Modal.error
 Vue.prototype.$warning = Modal.warning
 
-process.env.NODE_ENV !== 'production' && console.warn('[jeecg-boot-vue] NOTICE: Antd use lazy-load.')
+process.env.NODE_ENV !== 'production' && console.warn('Hujw:正在使用按需加载组件功能,避免造成打包后包过大的情况  [jeecg-boot-vue] NOTICE: Antd use lazy-load.')
