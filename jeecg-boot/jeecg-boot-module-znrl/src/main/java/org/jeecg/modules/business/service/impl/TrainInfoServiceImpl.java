@@ -2,11 +2,10 @@ package org.jeecg.modules.business.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.modules.business.mapper.BizToolMapper;
 import org.jeecg.modules.business.mapper.TrainInfoMapper;
-import org.jeecg.modules.business.service.IBizToolService;
 import org.jeecg.modules.business.service.TrainInfoService;
 import org.jeecg.modules.business.vo.RegisterEntity;
+import org.jeecg.modules.common.mapper.BizToolMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
