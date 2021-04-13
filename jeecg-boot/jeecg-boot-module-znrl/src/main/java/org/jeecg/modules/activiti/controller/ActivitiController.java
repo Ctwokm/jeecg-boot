@@ -290,7 +290,6 @@ public class ActivitiController {
     public Result qryTasksHisList(ActivitiHisEntity activitiHisEntity) {
         //需要分页的实体bean都用父类定义，方便设置page相关参数
         Result result = new Result();
-        //todo 这里后续需要加个查询分页，否则随着时间积累数据太多影响响应
         try {
             result = activitiService.qryTasksHisList(activitiHisEntity);
         } catch (Exception e) {

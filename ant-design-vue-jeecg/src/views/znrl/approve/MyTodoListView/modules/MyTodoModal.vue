@@ -8,12 +8,17 @@
       <section ref="print" id="printContentFlow" class="ShowFlowDetail">
         <iframe :src="this.url.verifyImgUrl" frameborder="0" width="100%" height="350px" scrolling="auto"></iframe>
       </section>
-      <a-table :columns="columns" :data-source="dataSource" size="small" />
+      <a-table
+        :columns="columns"
+        :pagination=false
+        rowKey="taskName"
+        :data-source="dataSource" size="small" />
     </a-modal>
 </template>
 
 <script>
   import { postAction } from '@/api/manage'
+  import Vue from "vue";
 
   export default {
     name: "MyTodoModal",
@@ -32,7 +37,7 @@
           xs: { span: 24 },
           sm: { span: 16 },
         },
-// 表头
+        // 表头
         columns: [{
           title: '#',
           dataIndex: '',
@@ -69,7 +74,7 @@
         validatorRules:{
         },
         url: {
-          verifyImgUrl: "http://localhost:8088/jeecg-boot/activiti/traceImage/",
+          verifyImgUrl: Vue.prototype.API_BASE_URL+"/activiti/traceImage/",
           qryHistoryProcessInstUrl:"/activiti/qryHistoryProcessInst"
         },
       }
@@ -84,17 +89,9 @@
           var params = {};
           params.processInstanceId = record.processInstanceId;
           console.log(params);
-          debugger
           postAction(this.url.qryHistoryProcessInstUrl, params).then((res) => {
             if (res.success) {
-              console.log(res);
               this.dataSource = res.result;
-              if(res.result.total)
-              {
-                this.ipagination.total = res.result.total;
-              }else{
-                this.ipagination.total = 0;
-              }
             }
             if(res.code===510){
               this.$message.warning(res.message)

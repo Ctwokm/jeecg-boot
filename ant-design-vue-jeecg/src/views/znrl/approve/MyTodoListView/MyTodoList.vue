@@ -8,16 +8,8 @@
 
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="审批类型">
-              <j-dict-select-tag   v-model="queryParam.name" :triggerChange="true"
-                                   dictCode="act_re_procdef,name_,id_"/>
-            </a-form-item>
-          </a-col>
-          <a-col :xl="6" :lg="7" :md="8" :sm="24">
-            <a-form-item label="审批时间">
-              <a-range-picker v-model="queryParam.birthdayRange"
-                              format="YYYY-MM-DD"
-                              :placeholder="['开始时间', '结束时间']"
-                              @change="onBirthdayChange" />
+              <j-dict-select-tag v-model="queryParam.appr_name" placeholder="请选择审批类型"
+                                 dictCode="act_re_procdef,name_,id_"/>
             </a-form-item>
           </a-col>
 
@@ -75,7 +67,7 @@
         rowKey="taskId"
         :columns="columns"
         :dataSource="dataSource"
-        :pagination="ipagination"
+        :pagination=false
         :loading="loading"
         :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
@@ -141,14 +133,11 @@
 <script>
   import MyTodoModal from './modules/MyTodoModal'
   import JInput from '@/components/jeecg/JInput.vue';
-  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import Vue from 'vue'
-  import { filterObj } from '@/utils/util';
-  import { postAction } from '@/api/manage'
+  import { postAction, getAction } from '@/api/manage'
 
   export default {
     name: "MyTodoList",
-    mixins:[JeecgListMixin],
     components: {
       MyTodoModal,
       JInput
@@ -156,6 +145,16 @@
     data() {
       return {
         description: '单表示例列表',
+        /* 查询条件-请不要在queryParam中声明非字符串值的属性 */
+        queryParam: {},
+        /* 数据源 */
+        dataSource:[],
+        /* table选中keys*/
+        selectedRowKeys: [],
+        /* table选中records*/
+        selectionRows: [],
+        /* table加载状态 */
+        loading:false,
         visible:false, //控制弹窗
         visibleFlow:false, //控制弹窗
         model: {},
@@ -232,23 +231,63 @@
         confirmLoading: false,
         url: {
           list: "/activiti/qryTodoTasks",
-          previewRptUrl:"http://localhost:8088/jeecg-boot/ureport/preview?_u=file:report_data.ureport.xml",
+          previewRptUrl:Vue.prototype.API_BASE_URL+"/ureport/preview?_u=file:report_data.ureport.xml",
           newPreviewRptUrl: "",
           flowApproval: "/activiti/doTask"
         },
       }
     },
     methods: {
+      searchQuery() {
+        this.loadData();
+      },
+      searchReset() {
+        this.queryParam = {}
+        this.loadData();
+      },
+      onSelectChange(selectedRowKeys, selectionRows) {
+        this.selectedRowKeys = selectedRowKeys;
+        this.selectionRows = selectionRows;
+      },
+      onClearSelected() {
+        this.selectedRowKeys = [];
+        this.selectionRows = [];
+      },
+      modalFormOk() {
+        // 新增/修改 成功时，重载列表
+        this.loadData();
+        //清空列表选中
+        this.onClearSelected()
+      },
+      loadData() {
+        if(!this.url.list){
+          this.$message.error("请设置url.list属性!")
+          return
+        }
+        var params = {};
+        debugger
+        if (this.queryParam.appr_name != null && this.queryParam.appr_name != ""){
+          var keys = this.queryParam.appr_name.split(':');
+          params.processKey = keys[0];//查询条件
+        }
+        this.loading = true;
+        getAction(this.url.list, params).then((res) => {
+          if (res.success) {
+            this.dataSource = res.result.records||res.result;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      },
       handleCancel () {
         this.visibleFlow=false;
       },
       // 查看被审批的数据，一般数据是报表形式
       handleShowDetails: function (record) {
-        // debugger
         if (record.paramJsonString !== null && record.paramJsonString !== undefined) {
           this.visible=true;
-          // JSON.stringify(object);
-          // JSON.parse(record.paramJsonString);
           this.url.newPreviewRptUrl = this.url.previewRptUrl+"&labor_code="+JSON.parse(record.paramJsonString).laborCode;
         }else {
           return ;
@@ -284,7 +323,6 @@
             params.taskId = this.selectionRows[a].taskId;//
             params.taskTodoTag = this.selectionRows[a].taskTodoTag;
             params.assignee= this.selectionRows[a].assignee;
-            debugger
             postAction(this.url.flowApproval, params).then((res) => {
               if (res.success) {
                 this.$message.success(res.message);
@@ -301,17 +339,6 @@
       },
       initDictConfig() {
         console.log("--我才是真的方法!--")
-        //初始化字典 - 性别
-        // initDictOptions('sex').then((res) => {
-        //   if (res.success) {
-        //     this.sexDictOptions = res.result;
-        //   }
-        // });
-      },
-      onBirthdayChange: function (value, dateString) {
-        console.log(dateString[0],dateString[1]);
-        this.queryParam.birthday_begin=dateString[0];
-        this.queryParam.birthday_end=dateString[1];
       },
       //列设置更改事件
       onColSettingsChange (checkedValues) {
@@ -359,6 +386,7 @@
     },
     created() {
       this.initColumns();
+      this.loadData();
     },
   }
 </script>
