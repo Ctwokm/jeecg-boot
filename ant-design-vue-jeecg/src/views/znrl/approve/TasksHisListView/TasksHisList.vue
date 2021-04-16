@@ -59,52 +59,26 @@
         :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
 
-        <div slot="filterDropdown">
-          <a-card>
-            <a-checkbox-group @change="onColSettingsChange" v-model="settingColumns" :defaultValue="settingColumns">
-              <a-row style="width: 400px">
-                <template v-for="(item,index) in defColumns">
-                  <template v-if="item.key!='rowIndex'&& item.dataIndex!='action'">
-                    <a-col :span="12"><a-checkbox :value="item.dataIndex"><j-ellipsis :value="item.title" :length="10"></j-ellipsis></a-checkbox></a-col>
-                  </template>
-                </template>
-              </a-row>
-            </a-checkbox-group>
-          </a-card>
-        </div>
-        <a-icon slot="filterIcon" type='setting' :style="{ fontSize:'16px',color:  '#108ee9' }" />
-
         <span slot="action" slot-scope="text, record">
+          <a @click="handleShowDetails(record)">查看已审批详情</a>
+          <a-divider type="vertical"/>
           <a @click="handleShowFlowDetail(record)">查看流程状态</a>
         </span>
 
       </a-table>
     </div>
 
+    <!-- table区域-end -->
     <a-modal
       v-model="visible"
-      title="化验报告审批内容"
+      title="化验报告已审批内容"
       :footer="null"
       width="60%"
     >
       <section ref="print" id="printContent" class="ShowLabDetail">
         <iframe :src="this.url.newPreviewRptUrl" frameborder="0" width="100%" height="350px" scrolling="auto"></iframe>
       </section>
-
     </a-modal>
-    <a-modal
-      v-model="visibleFlow"
-      title="化验报告审批操作"
-      :footer="null"
-      width="60%"
-    >
-      <section ref="print" id="printContentFlow" class="ShowFlowDetail">
-        <iframe :src="this.url.flowApproval" frameborder="0" width="100%" height="350px" scrolling="auto"></iframe>
-      </section>
-
-    </a-modal>
-    <!-- table区域-end -->
-
     <!-- 表单区域 -->
     <tasks-his-modal ref="modalForm" @ok="modalFormOk"></tasks-his-modal>
 
@@ -201,10 +175,19 @@
         ],
         url: {
           list: "/activiti/qryTasksHisList",
+          previewRptUrl:Vue.prototype.API_BASE_URL+"/ureport/preview?_u=file:report_data.ureport.xml",
+          newPreviewRptUrl: "",
         },
       }
     },
     methods: {
+      searchQuery() {
+        if (this.queryParam.appr_name != null && this.queryParam.appr_name != "") {
+          var keys = this.queryParam.appr_name.split(':');
+          this.queryParam.apprEventTypeCd = keys[0];//查询条件
+        }
+        this.loadData();
+      },
       onSelectChange(selectedRowKeys, selectionRows) {
         this.selectedRowKeys = selectedRowKeys;
         this.selectionRows = selectionRows;
@@ -214,6 +197,18 @@
         this.$refs.modalForm.handleShowFlowDetails(record);
         this.$refs.modalForm.title = "查看详情";
         this.$refs.modalForm.disableSubmit = false;
+      },
+      // 查看被审批的数据，一般数据是报表形式
+      handleShowDetails: function (record) {
+        if (record.exeComment !== null && record.exeComment !== undefined) {
+          var keys = record.exeComment.split(':');
+          var rptKey = keys[keys.length-1];//查询条件
+          console.log(rptKey);
+          this.visible=true;
+          this.url.newPreviewRptUrl = this.url.previewRptUrl+"&labor_code="+ rptKey;
+        }else {
+          return ;
+        }
       },
       initDictConfig() {
         console.log("--我才是真的方法!--")

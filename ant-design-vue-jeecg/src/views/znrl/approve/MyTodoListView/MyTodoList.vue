@@ -38,7 +38,7 @@
     <div>
       <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
         <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{
-          selectedRowKeys.length }}</a>项
+        selectedRowKeys.length }}</a>项
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
         <span style="float:right;">
           <a @click="loadData()"><a-icon type="sync" />刷新</a>
@@ -67,7 +67,7 @@
         rowKey="taskId"
         :columns="columns"
         :dataSource="dataSource"
-        :pagination=false
+        :pagination="ipagination"
         :loading="loading"
         :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
@@ -79,7 +79,6 @@
           <a-divider type="vertical"/>
           <a @click="handleShowFlowApproval">审批数据</a>
         </span>
-
       </a-table>
     </div>
 
@@ -134,27 +133,20 @@
   import MyTodoModal from './modules/MyTodoModal'
   import JInput from '@/components/jeecg/JInput.vue';
   import Vue from 'vue'
+  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import { postAction, getAction } from '@/api/manage'
 
   export default {
     name: "MyTodoList",
+    mixins:[JeecgListMixin],
     components: {
       MyTodoModal,
+      JDate,
       JInput
     },
     data() {
       return {
         description: '单表示例列表',
-        /* 查询条件-请不要在queryParam中声明非字符串值的属性 */
-        queryParam: {},
-        /* 数据源 */
-        dataSource:[],
-        /* table选中keys*/
-        selectedRowKeys: [],
-        /* table选中records*/
-        selectionRows: [],
-        /* table加载状态 */
-        loading:false,
         visible:false, //控制弹窗
         visibleFlow:false, //控制弹窗
         model: {},
@@ -165,7 +157,7 @@
         //列设置
         settingColumns:[],
         //列定义
-        defColumns: [
+        defColumns:[
           {
             title: '#',
             dataIndex: '',
@@ -239,48 +231,34 @@
     },
     methods: {
       searchQuery() {
-        this.loadData();
-      },
-      searchReset() {
-        this.queryParam = {}
-        this.loadData();
-      },
-      onSelectChange(selectedRowKeys, selectionRows) {
-        this.selectedRowKeys = selectedRowKeys;
-        this.selectionRows = selectionRows;
-      },
-      onClearSelected() {
-        this.selectedRowKeys = [];
-        this.selectionRows = [];
-      },
-      modalFormOk() {
-        // 新增/修改 成功时，重载列表
-        this.loadData();
-        //清空列表选中
-        this.onClearSelected()
-      },
-      loadData() {
-        if(!this.url.list){
-          this.$message.error("请设置url.list属性!")
-          return
-        }
-        var params = {};
-        debugger
-        if (this.queryParam.appr_name != null && this.queryParam.appr_name != ""){
-          var keys = this.queryParam.appr_name.split(':');
-          params.processKey = keys[0];//查询条件
-        }
-        this.loading = true;
-        getAction(this.url.list, params).then((res) => {
-          if (res.success) {
-            this.dataSource = res.result.records||res.result;
+          if (this.queryParam.appr_name != null && this.queryParam.appr_name != ""){
+            var keys = this.queryParam.appr_name.split(':');
+            this.queryParam.processKey = keys[0];//查询条件
           }
-          if(res.code===510){
-            this.$message.warning(res.message)
-          }
-          this.loading = false;
-        })
+        this.loadData();
       },
+      // loadData() {
+      //   if(!this.url.list){
+      //     this.$message.error("请设置url.list属性!")
+      //     return
+      //   }
+      //   var params = {};
+      //   debugger
+      //   if (this.queryParam.appr_name != null && this.queryParam.appr_name != ""){
+      //     var keys = this.queryParam.appr_name.split(':');
+      //     params.processKey = keys[0];//查询条件
+      //   }
+      //   this.loading = true;
+      //   getAction(this.url.list, params).then((res) => {
+      //     if (res.success) {
+      //       this.dataSource = res.result.records||res.result;
+      //     }
+      //     if(res.code===510){
+      //       this.$message.warning(res.message)
+      //     }
+      //     this.loading = false;
+      //   })
+      // },
       handleCancel () {
         this.visibleFlow=false;
       },
@@ -292,10 +270,6 @@
         }else {
           return ;
         }
-      },
-      handleTableChange(selectedRowKeys, selectionRows) {
-        this.selectedRowKeys = selectedRowKeys;
-        this.selectionRows = selectionRows;
       },
       //查看审批流程的详情，包括审批流程图和当前操作人，历史操作人信息
       handleShowFlowDetail: function (record) {
@@ -386,7 +360,7 @@
     },
     created() {
       this.initColumns();
-      this.loadData();
+      // this.loadData();
     },
   }
 </script>

@@ -5,14 +5,23 @@
     <!--  查询结果不分页  -->
     <select id="query"  resultType="java.util.HashMap">
 
-        <if test="sqlId != null and sqlId =='abc'.toString() ">
+        <if test="params.sqlId != null and params.sqlId =='abc'.toString() ">
             select * from sys_role
         </if>
 
-        <if test="sqlId != null and sqlId =='123'.toString() ">
+        <if test="params.sqlId != null and params.sqlId =='123'.toString() ">
             select * from sys_user_role
         </if>
-
+        <!--系统变量配置查询sql-->
+        <if test="params.sqlId != null and params.sqlId =='qryWorkModeTypeList'.toString() ">
+            SELECT A.TYPE_ID, A.PARENT_TYPE_ID, A.TYPE_NAME,  A.SHOW_TYPE, A.DATA_LOAD_TYPE, A.DATA_URL, A.UNIT, A.SHOW_COLUMN, A.DEPEND_TYPE_ID, A.DEPEND_VALUE,(SELECT B.WORK_MODE_VALUE FROM SYSTEM_WORK_MODE B WHERE B.TYPE_ID = A.TYPE_ID) WORK_MODE_VALUE
+            FROM WORK_MODE_TYPE A
+            WHERE 1 = 1
+            AND A.STATE = 1
+            <if test="params.parentTypeId != '' and params.parentTypeId != null" >
+                AND A.PARENT_TYPE_ID = #{params.parentTypeId,jdbcType=INTEGER}
+            </if>
+        </if>
     </select>
     <!--  查询结果根据参数判断是否分页  -->
     <select id="queryByPage"  resultType="java.util.HashMap">
